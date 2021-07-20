@@ -9,15 +9,14 @@ let quad: Quad;
 let camera: Camera;
 
 const arEngineSize = {
-    width: 1280,
-    height: 720
+    width: 843,
+    height: 600
 }
 
 const updateEngine = () => {
     scene3D.draw();
     const time = (performance.now() / 10000) * 10;
     
-    // quad.Transform.setPosition(vec3.fromValues(Math.sin(time)/2, Math.cos(time)/2 , 0));
     window.requestAnimationFrame(updateEngine);
 }
 
@@ -40,7 +39,8 @@ if (canvasRef) {
         { x: -0.5 , y: -0.5, z: 0.0 });
     
     
-    quad.Transform.setScale(vec3.fromValues(0.5, 0.2, 1.0));
+    quad.Transform.setScale(vec3.fromValues(2, 2, 1.0));
+    // quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
     window.requestAnimationFrame(updateEngine);
     scene3D.Add(quad);
 }

@@ -53,6 +53,10 @@ export class Transform implements EngineLifecycle {
         return this;
     }
 
+    public translate(direction: vec3): void {
+        this.position = vec3.add(this.position, this.position, direction);
+    }
+
     public updateMatrix(): void {
         this.positionMatrix = mat4.identity(this.positionMatrix);
         this.rotationMatrix = mat4.identity(this.rotationMatrix);

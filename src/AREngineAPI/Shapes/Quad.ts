@@ -54,11 +54,8 @@ export class Quad extends SceneObject {
             this.transform.onRender();
 
             let mvMatrix: mat4 =  mat4.create();
-            // mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix); 
-            // mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
-
-            mvMatrix = mat4.multiply(mvMatrix, this.transform.ModelMatrix, mvMatrix);
-
+            mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix); 
+            mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
             this.gl2.useProgram(this.shader.ShaderProgram);
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500 );
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, true, mvMatrix);

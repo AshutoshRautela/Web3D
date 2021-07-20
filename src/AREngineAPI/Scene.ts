@@ -1,7 +1,7 @@
 import { Camera } from './Camera';
 import { SceneObject } from './SceneObject';
 export class Scene {
-    private size = {
+    public size = {
         WIDTH: 1200,
         HEIGHT: 600
     };
@@ -21,6 +21,36 @@ export class Scene {
         }
         console.log('Initializing WebGL Renderer');
         this.renderableObjects = new Array<SceneObject>();
+        this.registerToInput();
+
+        this.gl2.viewport(0 , 0, this.size.WIDTH, this.size.HEIGHT);
+    }
+
+    private registerToInput() {
+        window.addEventListener('keydown', this.onKeyboardDown);
+        window.addEventListener('keypress', this.onKeyboardPress);
+        window.addEventListener('keyup', this.onKeyboardUp);
+    }
+
+    private unregisterToInput() {
+        window.removeEventListener('keydown', this.onKeyboardDown);
+        window.removeEventListener('keypress', this.onKeyboardPress);
+        window.removeEventListener('keyup', this.onKeyboardUp);
+    }
+
+    private onKeyboardDown = (event: KeyboardEvent) => {
+        this.renderableObjects.forEach(rObject => rObject.onKeyDown && rObject.onKeyDown(event));
+        this.renderCamera.onKeyDown && this.renderCamera.onKeyDown(event);
+    }
+
+    private onKeyboardUp = (event: KeyboardEvent) => {
+        this.renderableObjects.forEach(rObject => rObject.onKeyUp && rObject.onKeyUp(event));
+        this.renderCamera.onKeyUp && this.renderCamera.onKeyUp(event);
+    }
+
+    private onKeyboardPress = (event: KeyboardEvent) => {
+        this.renderableObjects.forEach(rObject => rObject.onKeyPress && rObject.onKeyPress(event));
+        this.renderCamera.onKeyPress && this.renderCamera.onKeyPress(event);
     }
 
     private clearCanvas() {

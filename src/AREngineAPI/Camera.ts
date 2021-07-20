@@ -1,7 +1,7 @@
 import { mat4, vec3, vec4 } from "gl-matrix";
 import { Scene } from "./Scene";
 import { SceneObject } from "./SceneObject";
-
+import { Util } from './Util';
 export class Camera extends SceneObject {
 
     private viewMatrix: mat4;
@@ -30,18 +30,33 @@ export class Camera extends SceneObject {
 
         this.cameraUp = vec3.create();
         this.cameraUp = vec3.cross(this.cameraUp, this.cameraDirection, this.cameraRight);
-    }
 
-    private test: number  = 0;
+        this.transform.setPosition(vec3.fromValues(0 , 0 , -3));
+        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.0001, 1000);
+    }
 
     onRender() {
         this.transform.onRender();
+        this.viewMatrix = this.transform.ModelMatrix;
+    }
 
-        this.viewMatrix = mat4.lookAt(this.viewMatrix, this.transform.position, this.cameraTarget, this.cameraUp);
-        // this.projectionMatrix = mat4.perspective(this.projectionMatrix, 60,  1.67, 0.1, 1000);
-        // this.projectionMatrix = mat4.ortho(this.projectionMatrix, -100, 100, -100, 100, -100, 1000);
+    onKeyPress(event: KeyboardEvent) {
+        console.log("Key Press: ", event.key);
+        const step = 0.01;
+        if (event.key === 'w') {
+            this.transform.translate(vec3.fromValues(0 , 0 , 1 * step));
+        }
+        else if (event.key === 'a') {
+            this.transform.translate(vec3.fromValues(-1 * step, 0 , 0));
+        }
+        else if (event.key === 'd') {
+            this.transform.translate(vec3.fromValues(0 , 0 , -1 * step));
+        }
+        else if (event.key === 's') {
+            this.transform.translate(vec3.fromValues(0 , 0 , -1 * step));
+        }
 
-        this.transform.setPosition(vec3.fromValues(0 , 0 , -10));
+        console.log("Position: ", this.transform.position);
     }
 
     public get ViewMatrix(): mat4 {
