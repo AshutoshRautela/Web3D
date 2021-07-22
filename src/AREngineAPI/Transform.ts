@@ -64,8 +64,7 @@ export class Transform implements EngineLifecycle {
         this.modelMatrix = mat4.identity(this.modelMatrix);
 
         this.positionMatrix = mat4.translate(this.positionMatrix, this.positionMatrix, this.position);
-        this.scaleMatrix = mat4.scale(this.scaleMatrix, this.scaleMatrix, this.scale);
-
+        
         let rotX = mat4.create();
         rotX = mat4.rotateX(rotX, rotX, this.eulerAngles[0]);
         let rotY = mat4.create();
@@ -74,8 +73,9 @@ export class Transform implements EngineLifecycle {
         rotZ = mat4.rotateZ(rotZ, rotZ, this.eulerAngles[2]);
         let rotZY = mat4.create();
         rotZY = mat4.multiply(rotZY, rotZ, rotY);
-        
+
         this.rotationMatrix = mat4.multiply(this.rotationMatrix, rotZY, rotX);
+        this.scaleMatrix = mat4.scale(this.scaleMatrix, this.scaleMatrix, this.scale);
 
         this.modelMatrix = mat4.multiply(this.modelMatrix, this.modelMatrix, this.positionMatrix);
         this.modelMatrix = mat4.multiply(this.modelMatrix, this.modelMatrix, this.rotationMatrix);

@@ -20,6 +20,16 @@ const updateEngine = () => {
     window.requestAnimationFrame(updateEngine);
 }
 
+const addModels = () => {
+    quad = new Quad(scene3D, { x: -0.5, y: 0.5, z: 0.0 },
+        { x: 0.5 , y: 0.5, z: 0.0 },
+        { x: 0.5 , y: -0.5, z: 0.0 },
+        { x: -0.5 , y: -0.5, z: 0.0 });
+    quad.Transform.setScale(vec3.fromValues(2, 2, 1.0));
+    quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
+    scene3D.Add(quad);
+}
+
 canvasRef = document.createElement('canvas');
 canvasRef.width = arEngineSize.width;
 canvasRef.height = arEngineSize.height;
@@ -32,16 +42,8 @@ if (canvasRef) {
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);
     scene3D.AddCamera(camera);
-    
-    quad = new Quad(scene3D, { x: -0.5, y: 0.5, z: 0.0 },
-        { x: 0.5 , y: 0.5, z: 0.0 },
-        { x: 0.5 , y: -0.5, z: 0.0 },
-        { x: -0.5 , y: -0.5, z: 0.0 });
-    
-    
-    quad.Transform.setScale(vec3.fromValues(2, 2, 1.0));
-    // quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
     window.requestAnimationFrame(updateEngine);
-    scene3D.Add(quad);
+
+    addModels();
 }
 
