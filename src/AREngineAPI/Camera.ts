@@ -24,24 +24,18 @@ export class Camera extends SceneObject {
         this.cameraUp = vec3.create();
         this.lootAtPosition = vec3.create();
 
-        this.transform.setPosition(vec3.fromValues(0 , 0 , -5));
-        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.0001, 1000);
+        this.transform.setPosition(vec3.fromValues(0 , 0 , -3));
+        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.00000000001, 1000);
     }
 
     onRender() {
         this.transform.onRender();
 
-        this.cameraForward = vec3.subtract(this.cameraForward, this.transform.position, this.lootAtPosition);
-
-        // Getting camera forward direction i.e., z for the camera
-        this.cameraForward = vec3.normalize(this.cameraForward, this.cameraForward); 
-        // Getting camera right direction i.e, x for the camera
-        this.cameraRight = vec3.cross(this.cameraRight, this.cameraForward, vec3.fromValues(0 , 1 , 0));
-        // Getting camera up direction i.e, y for camera
-        this.cameraUp = vec3.cross(this.cameraUp, this.cameraRight, this.cameraForward);;
+        // this.cameraForward = vec3.subtract(this.cameraForward, this.transform.position, this.lootAtPosition);
+        this.cameraForward = vec3.add(this.cameraForward, this.transform.position, vec3.fromValues(0 , 0 , 1));
 
         // Generating a view matrix for camera looking at the origin
-        this.viewMatrix = mat4.lookAt(this.viewMatrix, this.transform.position, this.transform.eulerAngles, vec3.fromValues(0 , 1 , 0));
+        this.viewMatrix = mat4.lookAt(this.viewMatrix, this.transform.position, this.cameraForward, vec3.fromValues(0 , 1 , 0));
     }
 
     onKeyPress(event: KeyboardEvent) {

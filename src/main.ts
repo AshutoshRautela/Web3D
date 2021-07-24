@@ -1,7 +1,7 @@
-import { vec3 } from "gl-matrix";
-import { Camera } from "./AREngineAPI/Camera";
-import { Scene } from "./AREngineAPI/Scene";
-import { Quad } from "./AREngineAPI/Shapes/Quad";
+import { vec3 } from 'gl-matrix';
+import { Camera } from './AREngineAPI/Camera';
+import { Scene } from './AREngineAPI/Scene';
+import { Quad } from './AREngineAPI/Shapes/Quad';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -25,7 +25,7 @@ const addModels = () => {
         { x: 0.5 , y: 0.5, z: 0.0 },
         { x: 0.5 , y: -0.5, z: 0.0 },
         { x: -0.5 , y: -0.5, z: 0.0 });
-    quad.Transform.setScale(vec3.fromValues(2, 2, 1.0));
+    quad.Transform.setScale(vec3.fromValues(1, 0.5, 1.0));
     quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
     scene3D.Add(quad);
 }
@@ -36,7 +36,7 @@ canvasRef.height = arEngineSize.height;
 
 document.body.appendChild(canvasRef);
 
-console.log("Main Running");
+console.log('Main Running');
 
 if (canvasRef) {
     scene3D = new Scene(canvasRef, arEngineSize);

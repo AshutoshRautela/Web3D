@@ -18,16 +18,14 @@ export class Quad extends SceneObject {
     constructor(scene3D: Scene, private p1: Vector3, private p2: Vector3, private p3: Vector3, private p4: Vector3) {
         super(scene3D);
         this.transform = new Transform();
-
-        this.mesh = new Mesh(this.scene3D, require('../MeshFiles/QuadMesh.json'));
-        this.mesh.onInit();
-        
         this.shader = new Shader(this.gl2, require('../shaders/vertMvp/vert.glsl'), require('../shaders/vertMvp/frag.glsl'));
         if(!this.shader.ShaderProgram) {
             console.error(`Couldn't create a shader for Quad`);
             return;
         }
-
+        
+        this.mesh = new Mesh(this.scene3D, this.shader.ShaderProgram, require('../MeshFiles/QuadMesh.json'));
+        this.mesh.onInit();
         this.vertexAttriLocation = this.gl2.getAttribLocation(this.shader.ShaderProgram, 'a_position');
         this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
         this.mvpUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_mvp');
@@ -42,14 +40,10 @@ export class Quad extends SceneObject {
             mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
 
             this.gl2.useProgram(this.shader.ShaderProgram);
+
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500 );
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, true, mvMatrix);
             
-            this.mesh.bind();
-            this.gl2.enableVertexAttribArray(this.vertexAttriLocation);
-            this.gl2.vertexAttribPointer(this.vertexAttriLocation, 3, this.gl2.FLOAT, false, 0, 0);
-            
-            this.mesh.unbind();
             this.mesh.draw();
         }
     }
