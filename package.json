@@ -11,7 +11,8 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "build.all": "npm run build.prod && npm run build.esnext",
-    "test": "karma start karma.config.js"
+    "test": "karma start karma.config.js",
+    "lint:fix": "tslint --fix --project tsconfig.json"
   },
   "keywords": [
     "webpack",
@@ -42,6 +43,7 @@
   },
   "dependencies": {
     "gl-matrix": "^3.3.0",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "tsm": "^1.0.1"
   }
 }

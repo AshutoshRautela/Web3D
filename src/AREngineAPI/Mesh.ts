@@ -1,4 +1,3 @@
-import { vec2, vec3 } from 'gl-matrix';
 import { EngineLifecycle } from './EngineLifeCycle';
 import { MeshData } from './interfaces';
 import { Scene } from './Scene';
@@ -29,17 +28,17 @@ export class Mesh implements EngineLifecycle {
     onInit() {
         this.vBuffer = this.gl2.createBuffer();
         if (!this.vBuffer) {
-            console.error("Couldn't allocate buffer!");
+            console.error(`Couldn't allocate buffer!`);
             return;
         }
         this.eBuffer = this.gl2.createBuffer();
         if (!this.eBuffer) {
-            console.error("Couldn't allocate buffer!");
+            console.error(`Couldn't allocate buffer!`);
             return;
         }
         this.vArrayObject = this.gl2.createVertexArray();
         if (!this.vArrayObject) {
-            console.error("Couldn't create Vertex Array Object");
+            console.error(`Couldn't create Vertex Array Object`);
             return;
         }
 

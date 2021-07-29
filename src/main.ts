@@ -1,12 +1,17 @@
 import { vec3 } from 'gl-matrix';
 import { Camera } from './AREngineAPI/Camera';
 import { Scene } from './AREngineAPI/Scene';
+import { Cube } from './AREngineAPI/Shapes/Cube';
 import { Quad } from './AREngineAPI/Shapes/Quad';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
-let quad: Quad;
 let camera: Camera;
+
+// Elements in Scene
+let quad: Quad;
+let cube: Cube;
+
 
 const arEngineSize = {
     width: 843,
@@ -16,19 +21,22 @@ const arEngineSize = {
 const updateEngine = () => {
     scene3D.draw();
     const time = (performance.now() / 10000) * 10;
-    
+
     window.requestAnimationFrame(updateEngine);
 }
 
 const addModels = () => {
-    quad = new Quad(scene3D, { x: -0.5, y: 0.5, z: 0.0 },
-        { x: 0.5 , y: 0.5, z: 0.0 },
-        { x: 0.5 , y: -0.5, z: 0.0 },
-        { x: -0.5 , y: -0.5, z: 0.0 });
-    quad.Transform.setScale(vec3.fromValues(0.5, 0.5, 1.0));
-    quad.Transform.setEulerAngles(vec3.fromValues(0 , 0 , 0));
-    quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
-    scene3D.Add(quad);
+    quad = new Quad(scene3D);
+    quad.Transform.setScale(vec3.fromValues(0.5, 0.5, 1.0))
+        .setEulerAngles(vec3.fromValues(0, 0, 0))
+        .setPosition((vec3.fromValues(0, 0, 0)));
+    // scene3D.Add(quad);
+
+    cube = new Cube(scene3D);
+    scene3D.Add(cube);
+
+    cube.Transform.setPosition(vec3.fromValues(0, 0, 0));
+    cube.Transform.setEulerAngles(vec3.fromValues(0, 0, 0));
 }
 
 canvasRef = document.createElement('canvas');
@@ -44,7 +52,7 @@ if (canvasRef) {
     camera = new Camera(scene3D);
     scene3D.AddCamera(camera);
     window.requestAnimationFrame(updateEngine);
-    
+
     addModels();
 }
 

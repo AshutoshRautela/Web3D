@@ -75,7 +75,7 @@ export class Shader implements EngineLifecycle {
     private cleanUp() {
         this.vShader && this.gl2.deleteShader(this.vShader);
         this.fShader && this.gl2.deleteShader(this.fShader);
-        this.shaderProgram && this.gl2.deleteProgram(this.shaderProgram);        
+        this.shaderProgram && this.gl2.deleteProgram(this.shaderProgram);
     }
 
     public get ShaderProgram(): WebGLProgram | null {

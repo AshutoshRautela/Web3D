@@ -1,12 +1,14 @@
-import { mat4, vec3 } from 'gl-matrix';
-import { Mesh } from '../Mesh';
-import { Scene } from '../Scene';
-import { SceneObject, Vector3 } from '../SceneObject';
-import { Shader } from '../Shader';
-import { Transform } from '../Transform';
-export class Quad extends SceneObject {
+import { mat4 } from "gl-matrix";
+import { Mesh } from "../Mesh";
+import { Scene } from "../Scene";
+import { SceneObject } from "../SceneObject";
+import { Shader } from "../Shader";
+import { Transform } from "../Transform";
 
-    private shader!: Shader;
+
+export class Cube extends SceneObject {
+
+    private shader: Shader;
     private mesh: Mesh;
 
     private timeUniformLocation!: WebGLUniformLocation | null;
@@ -14,14 +16,21 @@ export class Quad extends SceneObject {
 
     constructor(scene3D: Scene) {
         super(scene3D);
+
         this.transform = new Transform();
-        this.shader = new Shader(this.gl2, require('../shaders/vertMvp/vert.glsl'), require('../shaders/vertMvp/frag.glsl'));
-        if(!this.shader.ShaderProgram) {
-            console.error(`Couldn't create a shader for Quad`);
-            return;
+        this.shader = new Shader(this.gl2,
+            require('../shaders/vertMvp/vert.glsl'),
+            require('../shaders/vertMvp/frag.glsl')
+        );
+        if (!this.shader.ShaderProgram) {
+            throw new Error("Error Loading Shader Program");
         }
 
-        this.mesh = new Mesh(this.scene3D, this.shader.ShaderProgram, require('../MeshFiles/QuadMesh.json'));
+        this.mesh = new Mesh(
+            this.scene3D,
+            this.shader.ShaderProgram,
+            require('../MeshFiles/CubeMesh.json')
+        );
         this.mesh.onInit();
 
         this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
@@ -49,4 +58,5 @@ export class Quad extends SceneObject {
         this.mesh.onDestroy();
         this.shader.onDestroy();
     }
+
 }

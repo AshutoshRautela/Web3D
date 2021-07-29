@@ -12,7 +12,7 @@ export class Camera extends SceneObject {
     private cameraUp: vec3;
 
     private lootAtPosition: vec3;
-    
+
 
     constructor(scene3D: Scene) {
         super(scene3D);
@@ -30,7 +30,7 @@ export class Camera extends SceneObject {
 
     onRender() {
         this.transform.onRender();
-        
+
         this.cameraForward = vec3.add(this.cameraForward, this.transform.position, vec3.fromValues(0 , 0 , 1));
 
         this.viewMatrix = this.getViewMatrix();
@@ -45,10 +45,6 @@ export class Camera extends SceneObject {
         this.cameraRight = vec3.cross(this.cameraRight ,  vec3.fromValues(0 , 1 , 0), this.cameraForward);
         this.cameraUp = vec3.cross(this.cameraUp, this.cameraForward, this.cameraRight);
 
-        console.log("Camera Forward: ", this.cameraForward);
-        console.log("Cameara Right: ", this.cameraRight);
-        console.log("Camear Up: ", this.cameraUp);
-
         const dMatrix = mat4.fromValues(
             this.cameraRight[0], this.cameraRight[1], this.cameraRight[2] , 0,
             this.cameraUp[0], this.cameraUp[1], this.cameraUp[2], 0,
@@ -57,7 +53,7 @@ export class Camera extends SceneObject {
         );
         let tMatrix = mat4.create();
         tMatrix = mat4.translate(tMatrix, tMatrix, vec3.fromValues(-this.transform.position[0], this.transform.position[1], this.transform.position[2]));
-        
+
         let vMatrix = mat4.create();
         vMatrix = mat4.multiply(vMatrix, dMatrix, tMatrix);
         return vMatrix;

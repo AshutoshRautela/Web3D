@@ -47,7 +47,6 @@ export class Transform implements EngineLifecycle {
     public setEulerAngles(angles: vec3): Transform {
         vec3.set(angles, Util.DegreesToRadians(angles[0]) , Util.DegreesToRadians(angles[1]), Util.DegreesToRadians(angles[2]));
         vec3.copy(this.eulerAngles, angles);
-        console.log("Euler Angles in radians: ", this.eulerAngles);
         return this;
     }
 
@@ -71,7 +70,7 @@ export class Transform implements EngineLifecycle {
         this.modelMatrix = mat4.identity(this.modelMatrix);
 
         this.positionMatrix = mat4.translate(this.positionMatrix, this.positionMatrix, this.position);
-        
+
         let rotX = mat4.create();
         rotX = mat4.rotateX(rotX, rotX, this.eulerAngles[0]);
         let rotY = mat4.create();

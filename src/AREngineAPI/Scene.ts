@@ -8,7 +8,7 @@ export class Scene {
     private canvas: HTMLCanvasElement;
     private gl2: WebGL2RenderingContext;
     private renderCamera!: Camera;
-    private renderableObjects: Array<SceneObject> = [];
+    private renderableObjects: SceneObject[] = [];
 
     constructor(canvasElement: HTMLCanvasElement, size: {width: number, height: number}) {
         this.canvas = canvasElement;

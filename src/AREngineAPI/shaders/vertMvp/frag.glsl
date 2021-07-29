@@ -13,5 +13,7 @@ void main() {
     float y = abs(cos(u_time * fMultiplier) * aMultiplier);
     float z = abs(sin(u_time * fMultiplier) * aMultiplier);
 
-    finalColor = vec4(x, y, z, 1.0);
+    vec3 col = vec3(0.5);
+
+    finalColor = vec4(col, 1.0);
 }
