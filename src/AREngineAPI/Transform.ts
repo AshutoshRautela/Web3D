@@ -1,5 +1,6 @@
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { EngineLifecycle } from './EngineLifeCycle';
+import { Util } from './Util';
 
 export class Transform implements EngineLifecycle {
 
@@ -44,7 +45,9 @@ export class Transform implements EngineLifecycle {
      * setEulerAngles
      */
     public setEulerAngles(angles: vec3): Transform {
+        vec3.set(angles, Util.DegreesToRadians(angles[0]) , Util.DegreesToRadians(angles[1]), Util.DegreesToRadians(angles[2]));
         vec3.copy(this.eulerAngles, angles);
+        console.log("Euler Angles in radians: ", this.eulerAngles);
         return this;
     }
 
@@ -55,6 +58,10 @@ export class Transform implements EngineLifecycle {
 
     public translate(direction: vec3): void {
         this.position = vec3.add(this.position, this.position, direction);
+    }
+
+    public rotate(angle: vec3): void {
+        this.eulerAngles = vec3.add(this.eulerAngles, this.eulerAngles, angle);
     }
 
     public updateMatrix(): void {

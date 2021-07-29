@@ -25,7 +25,8 @@ const addModels = () => {
         { x: 0.5 , y: 0.5, z: 0.0 },
         { x: 0.5 , y: -0.5, z: 0.0 },
         { x: -0.5 , y: -0.5, z: 0.0 });
-    quad.Transform.setScale(vec3.fromValues(1, 0.5, 1.0));
+    quad.Transform.setScale(vec3.fromValues(0.5, 0.5, 1.0));
+    quad.Transform.setEulerAngles(vec3.fromValues(0 , 0 , 0));
     quad.Transform.setPosition((vec3.fromValues(0 , 0, 0)));
     scene3D.Add(quad);
 }
@@ -43,7 +44,7 @@ if (canvasRef) {
     camera = new Camera(scene3D);
     scene3D.AddCamera(camera);
     window.requestAnimationFrame(updateEngine);
-
+    
     addModels();
 }
 

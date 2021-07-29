@@ -42,7 +42,7 @@ export class Quad extends SceneObject {
             this.gl2.useProgram(this.shader.ShaderProgram);
 
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500 );
-            this.gl2.uniformMatrix4fv(this.mvpUniformLocation, true, mvMatrix);
+            this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
             
             this.mesh.draw();
         }
