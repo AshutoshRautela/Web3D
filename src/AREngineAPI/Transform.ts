@@ -55,11 +55,11 @@ export class Transform implements EngineLifecycle {
         return this;
     }
 
-    public translate(direction: vec3): void {
+    public Translate(direction: vec3): void {
         this.position = vec3.add(this.position, this.position, direction);
     }
 
-    public rotate(angle: vec3): void {
+    public Rotate(angle: vec3): void {
         this.eulerAngles = vec3.add(this.eulerAngles, this.eulerAngles, angle);
     }
 

@@ -24,7 +24,7 @@ export class Camera extends SceneObject {
         this.cameraUp = vec3.create();
         this.lootAtPosition = vec3.create();
 
-        this.transform.setPosition(vec3.fromValues(0 , 0 , -5));
+        this.transform.setPosition(vec3.fromValues(0 , 0 , -3));
         this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.00000000001, 1000);
     }
 
@@ -41,9 +41,11 @@ export class Camera extends SceneObject {
 
     // Generating LookAt Matrix
     getViewMatrix(): mat4 {
-        this.cameraForward = vec3.fromValues(0 , 0 , 1);
-        this.cameraRight = vec3.cross(this.cameraRight ,  vec3.fromValues(0 , 1 , 0), this.cameraForward);
-        this.cameraUp = vec3.cross(this.cameraUp, this.cameraForward, this.cameraRight);
+        this.cameraForward = vec3.fromValues(0 , 0 , -1);
+        // this.cameraRight = vec3.cross(this.cameraRight ,  vec3.fromValues(0 , 1 , 0), this.cameraForward);
+        // this.cameraUp = vec3.cross(this.cameraUp, this.cameraForward, this.cameraRight);
+        this.cameraRight = vec3.cross(this.cameraRight , this.cameraForward, vec3.fromValues(0 , 1 , 0));
+        this.cameraUp = vec3.cross(this.cameraUp, this.cameraRight, this.cameraForward);
 
         const dMatrix = mat4.fromValues(
             this.cameraRight[0], this.cameraRight[1], this.cameraRight[2] , 0,
@@ -52,7 +54,7 @@ export class Camera extends SceneObject {
             0 , 0 , 0 , 1
         );
         let tMatrix = mat4.create();
-        tMatrix = mat4.translate(tMatrix, tMatrix, vec3.fromValues(-this.transform.position[0], this.transform.position[1], this.transform.position[2]));
+        tMatrix = mat4.translate(tMatrix, tMatrix, vec3.fromValues(-this.transform.position[0], -this.transform.position[1], -this.transform.position[2]));
 
         let vMatrix = mat4.create();
         vMatrix = mat4.multiply(vMatrix, dMatrix, tMatrix);
@@ -62,18 +64,21 @@ export class Camera extends SceneObject {
     onKeyPress(event: KeyboardEvent) {
         const step = 0.1;
         if (event.key === 'w') {
-            this.transform.translate(vec3.fromValues(0 , 0 , 1 * step));
+            this.transform.Translate(vec3.fromValues(0 , 0 , 1 * step));
         }
         else if (event.key === 'a') {
-            this.transform.translate(vec3.fromValues(-1 * step, 0 , 0));
+            this.transform.Translate(vec3.fromValues(-1 * step, 0 , 0));
         }
         else if (event.key === 'd') {
-            this.transform.translate(vec3.fromValues(1 * step , 0 , 0));
+            this.transform.Translate(vec3.fromValues(1 * step , 0 , 0));
         }
         else if (event.key === 's') {
-            this.transform.translate(vec3.fromValues(0 , 0 , -1 * step));
+            this.transform.Translate(vec3.fromValues(0 , 0 , -1 * step));
+        } else if (event.key === 'e') {
+            this.transform.Translate(vec3.fromValues(0 , 1 * step, 0));
+        } else if (event.key === 'q') {
+            this.transform.Translate(vec3.fromValues(0 , -1 * step, 0));
         }
-        console.log("Position: ", this.transform.position);
     }
 
     public get ViewMatrix(): mat4 {
