@@ -2,18 +2,18 @@
 
 precision mediump float;
 
+in vec3 vNormal;
+
 out vec4 finalColor;
 uniform float u_time;
 
-float fMultiplier = 1.0;
-float aMultiplier = 2.0;
-
 void main() {
-    float x = abs(sin(u_time * fMultiplier) * aMultiplier);
-    float y = abs(cos(u_time * fMultiplier) * aMultiplier);
-    float z = abs(sin(u_time * fMultiplier) * aMultiplier);
+    //Directional Light
+    vec3 light = normalize(vec3( 0 , 0 , 1));
 
-    vec3 col = vec3(0.5);
+    float diffuse = dot(vNormal, -light);
 
+    vec3 col = vec3(1.0) * diffuse;
     finalColor = vec4(col, 1.0);
+    // finalColor = vec4(vec3(1), 1.0);
 }

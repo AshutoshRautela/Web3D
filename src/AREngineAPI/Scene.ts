@@ -1,13 +1,19 @@
 import { Camera } from './Camera';
+import { Light } from './Lights/Light';
 import { SceneObject } from './SceneObject';
 export class Scene {
+
     public size = {
         WIDTH: 1200,
         HEIGHT: 600
     };
+
     private canvas: HTMLCanvasElement;
     private gl2: WebGL2RenderingContext;
+
     private renderCamera!: Camera;
+    private light!: Light;
+
     private renderableObjects: SceneObject[] = [];
 
     constructor(canvasElement: HTMLCanvasElement, size: {width: number, height: number}) {
@@ -20,6 +26,7 @@ export class Scene {
             console.error('Failed to get Webgl2 Rendering Context');
         }
         console.log('Initializing WebGL Renderer');
+
         this.renderableObjects = new Array<SceneObject>();
         this.registerToInput();
 
@@ -54,13 +61,17 @@ export class Scene {
     }
 
     private clearCanvas() {
-        this.gl2.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl2.clearColor(0.5, 0.5, 0.5, 1.0);
         this.gl2.clear(this.gl2.COLOR_BUFFER_BIT | this.gl2.DEPTH_BUFFER_BIT);
         this.gl2.viewport(0, 0, this.size.WIDTH, this.size.HEIGHT);
     }
 
     public AddCamera(camera: Camera) {
         this.renderCamera = camera;
+    }
+
+    public AddLight(light: Light) {
+        this.light = light;
     }
 
     public Add(sObject: SceneObject) {
@@ -70,6 +81,9 @@ export class Scene {
     private lastTick = 0;
 
     public draw = () =>  {
+        this.gl2.enable(this.gl2.CULL_FACE);
+        this.gl2.frontFace(this.gl2.CW);
+
         this.clearCanvas();
         this.renderCamera.onRender();
 
