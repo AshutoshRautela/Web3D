@@ -61,7 +61,7 @@ export class Scene {
     }
 
     private clearCanvas() {
-        this.gl2.clearColor(0.5, 0.5, 0.5, 1.0);
+        this.gl2.clearColor(0, 0, 0, 1.0);
         this.gl2.clear(this.gl2.COLOR_BUFFER_BIT | this.gl2.DEPTH_BUFFER_BIT);
         this.gl2.viewport(0, 0, this.size.WIDTH, this.size.HEIGHT);
     }

@@ -30,7 +30,7 @@ const updateEngine = () => {
     quad.Transform.setEulerAngles(vec3.fromValues(0, Math.sin(time) * 200, 0));
     // quad.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2, Math.cos(time) * 1.5 + 3, 4));
 
-    base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 100, 0 , 0 ));
+    base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
 
     cube.Transform.Rotate(vec3.fromValues(0, 0.04, 0));
     window.requestAnimationFrame(updateEngine);
@@ -52,7 +52,7 @@ const addModels = () => {
     base = new Quad(scene3D);
     base.Transform.setEulerAngles(vec3.fromValues(30 , 0 , 0))
                   .setPosition(vec3.fromValues(0 , 0 , 10))
-                  .setScale(vec3.fromValues(5 , 4, 1));
+                  .setScale(vec3.fromValues(20 , 15, 1));
     
     scene3D.Add(base);
 
