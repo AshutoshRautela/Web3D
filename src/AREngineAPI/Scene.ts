@@ -12,7 +12,7 @@ export class Scene {
     private gl2: WebGL2RenderingContext;
 
     private renderCamera!: Camera;
-    private light!: Light;
+    private light: Light | null = null;
 
     private renderableObjects: SceneObject[] = [];
 
@@ -61,7 +61,7 @@ export class Scene {
     }
 
     private clearCanvas() {
-        this.gl2.clearColor(0, 0, 0, 1.0);
+        this.gl2.clearColor(0.05, 0.05, 0.05, 1.0);
         this.gl2.clear(this.gl2.COLOR_BUFFER_BIT | this.gl2.DEPTH_BUFFER_BIT);
         this.gl2.viewport(0, 0, this.size.WIDTH, this.size.HEIGHT);
     }
@@ -99,5 +99,9 @@ export class Scene {
 
     public get RenderCamera(): Camera {
         return this.renderCamera;
+    }
+
+    public get Light(): Light | null {
+        return this.light;
     }
 }

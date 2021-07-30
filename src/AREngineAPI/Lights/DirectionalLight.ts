@@ -25,4 +25,8 @@ export class DirectionalLight extends Light {
         this.intensity = intensity;
         return this;
     }
+
+    public get Direction() {
+        return this.direction;
+    }
 }

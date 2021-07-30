@@ -27,11 +27,7 @@ export class Mesh implements EngineLifecycle {
     ) {
         console.log("Recieved Mesh Data: ", meshData);
 
-        let vertArray = meshData.vertices.map((vertex: Vector3) => [
-            vertex.x,
-            vertex.y,
-            vertex.z,
-        ]);
+        let vertArray = meshData.vertices;
         
         const normals = meshData.normals;
         this.containsNormals = meshData.normals ? true : false;
