@@ -1,13 +1,12 @@
 import { mat4 } from "gl-matrix";
 import { DirectionalLight } from "../Lights/DirectionalLight";
-import { SpotLight } from "../Lights/SpotLight";
+import { PointLight } from "../Lights/PointLight";
 import { PhoneShadingMaterial } from "../Materials/PhongShadingMaterial";
 import { Mesh } from "../Mesh";
 import { Scene } from "../Scene";
 import { SceneObject } from "../SceneObject";
 import { Shader } from "../Shader";
 import { Transform } from "../Transform";
-
 
 export class Cube extends SceneObject {
 
@@ -20,6 +19,17 @@ export class Cube extends SceneObject {
 
     private lightDirUniformLocation: WebGLUniformLocation | null;
     private lightPosUniformLocation: WebGLUniformLocation | null;
+
+    private uniformDLightsCount: WebGLUniformLocation;
+    private uniformDLightsColor: WebGLUniformLocation[] = [];
+    private uniformDLightsDirection: WebGLUniformLocation[] = [];
+    private uniformDLightsIntensity: WebGLUniformLocation[] = [];
+
+    private uniformPLightsCount: WebGLUniformLocation;
+    private uniformPLightsColor: WebGLUniformLocation[] = [];
+    private uniformPLightsPosition: WebGLUniformLocation[] = [];
+    private uniformPLightsIntensity: WebGLUniformLocation[] = [];
+    private uniformPLightsAttenC: WebGLUniformLocation[] = [];
 
     constructor(scene3D: Scene) {
         super(scene3D);
@@ -44,9 +54,24 @@ export class Cube extends SceneObject {
         this.mvpUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_mvp');
         this.modelUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_model');
 
-        this.lightDirUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLight.direction');
-        this.lightPosUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_sLight.position');
+        // this.lightDirUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLight.direction');
+        // this.lightPosUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_sLight.position');
+        this.uniformDLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLights.numLights');
+        this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
+            this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].color`));
+            this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].direction`));
+            this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].intensity`));
+        });
 
+        this.uniformPLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_pLights.numLights');
+        this.scene3D.PointLights.forEach((pLight: PointLight, index: number) => {
+            this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].color`));
+            this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].position`));
+            this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].intensity`));
+            this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
+        });        
+
+        console.log("Light Colors uniform", this.uniformPLightsColor);
         this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 
@@ -63,12 +88,24 @@ export class Cube extends SceneObject {
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500 );
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
             this.gl2.uniformMatrix4fv(this.modelUniformLocation, false, this.transform.ModelMatrix);
-            if (this.scene3D.Light instanceof DirectionalLight) {
-                this.gl2.uniform3fv(this.lightDirUniformLocation, (this.scene3D.Light as DirectionalLight).Direction);
-            } else if (this.scene3D.Light instanceof SpotLight) {
-                this.gl2.uniform3fv(this.lightPosUniformLocation, (this.scene3D.Light as SpotLight).Position);
+            
+            if (this.scene3D.PointLights.length > 0) {
+                this.gl2.uniform1f(this.uniformPLightsCount, this.scene3D.PointLights.length);
+                this.scene3D.PointLights.forEach((pointLight: PointLight, index: number) => {
+                    this.gl2.uniform3fv(this.uniformPLightsColor[index], pointLight.Color);
+                    this.gl2.uniform3fv(this.uniformPLightsPosition[index], pointLight.Position);
+                    this.gl2.uniform1f(this.uniformPLightsIntensity[index], pointLight.Intensity);
+                    this.gl2.uniform3fv(this.uniformPLightsAttenC[index], pointLight.AttenuationCoeff);
+                });
+            };
+            if (this.scene3D.DirectionalLights.length > 0) {
+                this.gl2.uniform1f(this.uniformDLightsCount, this.scene3D.DirectionalLights.length);
+                this.scene3D.DirectionalLights.forEach((directionLight: DirectionalLight, index: number) => {
+                    this.gl2.uniform3fv(this.uniformDLightsColor[index], directionLight.Color);
+                    this.gl2.uniform3fv(this.uniformDLightsDirection[index], directionLight.Direction);
+                    this.gl2.uniform1f(this.uniformDLightsIntensity[index], directionLight.Intensity);
+                });
             }
-
             this.material.onUpdate();
             this.mesh.draw();
         }

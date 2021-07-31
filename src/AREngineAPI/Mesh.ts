@@ -25,21 +25,18 @@ export class Mesh implements EngineLifecycle {
         private shaderProgram: WebGLProgram,
         meshData: MeshData
     ) {
-        console.log("Recieved Mesh Data: ", meshData);
 
         let vertArray = meshData.vertices;
         
         const normals = meshData.normals;
         this.containsNormals = meshData.normals ? true : false;
 
-        console.log("Recevied Normals: ", normals);
 
         if (this.containsNormals) {
             vertArray = vertArray.map((vertex, index) => [
                 ...vertex,
                 ...normals[index],
             ]);
-            console.log("Prepared Vertex Arra: ", vertArray);
         }
 
         this.vertices = Float32Array.from(vertArray.flat());
@@ -73,8 +70,6 @@ export class Mesh implements EngineLifecycle {
             this.shaderProgram, 
             "a_normal"
         );
-        console.log("Normal Attrib Location: ", this.normal_AL, this.vertex_AL);
-
 
         this.gl2.bindVertexArray(this.vArrayObject);
         this.gl2.bindBuffer(this.gl2.ARRAY_BUFFER, this.vBuffer);
@@ -129,7 +124,6 @@ export class Mesh implements EngineLifecycle {
 
     public draw() {
         this.bind();
-        // this.gl2.drawArrays(this.gl2.TRIANGLES, 0, this.vertices.length / 3);
         this.gl2.drawElements(
             this.gl2.TRIANGLES,
             this.indices.length,

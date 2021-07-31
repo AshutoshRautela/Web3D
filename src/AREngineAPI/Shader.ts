@@ -27,7 +27,7 @@ export class Shader implements EngineLifecycle {
         this.gl2.compileShader(shader);
 
         if (!this.gl2.getShaderParameter(shader, this.gl2.COMPILE_STATUS)) {
-            console.error('Failed to compile Vertex Shader: ', this.gl2.getShaderInfoLog(shader));
+            console.error('Failed to compile Shader: ', shaderType,  this.gl2.getShaderInfoLog(shader));
             this.cleanUp();
             return null;
         }

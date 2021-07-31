@@ -1,16 +1,16 @@
 #version 300 es
+precision mediump float;
 
 #define MAX_LIGHTS 50
-precision mediump float;
+// Need to find solution for this
+#define NUM_LIGHTS 2
 
 in vec3 vNormal;
 in vec3 fragPos;
 
-out vec4 finalColor;
-
 uniform float u_time;
-uniform vec3 u_lightDir;
-uniform int totalLights;
+
+out vec4 finalColor;
 
 struct Material {
     vec4 color;
@@ -26,18 +26,27 @@ struct DirectionalLight {
     vec3 direction;
     float intensity;
 };
+struct DirectionalLights {
+    DirectionalLight lights[MAX_LIGHTS];
+    int numLights;
+};
+uniform DirectionalLights u_dLights;
 
-uniform DirectionalLight u_dLight;
-
-struct SpotLight {
+struct PointLight {
     vec3 color;
     vec3 position;
     vec3 intensity;
-};
-uniform SpotLight u_sLight;
-uniform SpotLight u_sLights[MAX_LIGHTS];
 
-float lightRange = 10.;
+    vec3 attenuationCoeff;
+};
+struct PointLights {
+    PointLight lights[MAX_LIGHTS];
+    int numLights;
+};
+uniform PointLights u_pLights;
+
+
+float lightRange = 50.;
 
 vec3 getAmbience(Material material) {
     return material.color.xyz * material.ambience;
@@ -62,16 +71,27 @@ vec3 getSpecular(Material material, vec3 normal, vec3 light) {
     return material.color.xyz * material.specular * specCoeff;
 }
 
-void main() {
-    float lightDistance = distance(u_sLight.position , fragPos);
-    float lightAttenuation = (1.0 / lightDistance) * lightRange;
-    vec3 lightDir = normalize(u_sLight.position - fragPos);
+vec3 getPointLightCast(PointLight pointLight) {
+    float lightDistance = distance(pointLight.position , fragPos);
+    vec3 lightDir = normalize(pointLight.position - fragPos);
+    float intensity = 1.2;
 
+    float atten = 1.0 / (pointLight.attenuationCoeff.x + (pointLight.attenuationCoeff.y * lightDistance) + (pointLight.attenuationCoeff.z * pow(lightDistance, 2.)));
+    // atten *= intensity;
 
-    vec3 ambience = getAmbience(u_material) * lightAttenuation;
-    vec3 diffuse = getDiffuse(u_material, vNormal, lightDir) * lightAttenuation;
-    vec3 specular = getSpecular(u_material, vNormal, lightDir) * lightAttenuation;
+    vec3 ambience = getAmbience(u_material) * pointLight.color * atten;
+    vec3 diffuse = getDiffuse(u_material, vNormal, lightDir) * pointLight.color * atten;
+    vec3 specular = getSpecular(u_material, vNormal, lightDir) * pointLight.color * atten;
     
-    vec3 compColor = ambience + diffuse + specular;
-    finalColor = vec4(compColor, 1.);
+    return ambience + diffuse + specular;
+}
+
+void main() {
+    vec3 pointLightCast = vec3(0);
+
+    for (int i = 0; i < NUM_LIGHTS; i++) {
+        pointLightCast += getPointLightCast(u_pLights.lights[i]);
+    }
+    
+    finalColor = vec4(pointLightCast, 1.0);
 }
