@@ -1,5 +1,7 @@
 import { Camera } from './Camera';
+import { DirectionalLight } from './Lights/DirectionalLight';
 import { Light } from './Lights/Light';
+import { PointLight } from './Lights/PointLight';
 import { SceneObject } from './SceneObject';
 export class Scene {
 
@@ -12,9 +14,11 @@ export class Scene {
     private gl2: WebGL2RenderingContext;
 
     private renderCamera!: Camera;
-    private light: Light | null = null;
-
     private renderableObjects: SceneObject[] = [];
+
+    private lights: Light[] = [];
+    private directionalLights: DirectionalLight[] = [];
+    private pointLights: PointLight[] = [];
 
     constructor(canvasElement: HTMLCanvasElement, size: {width: number, height: number}) {
         this.canvas = canvasElement;
@@ -71,7 +75,14 @@ export class Scene {
     }
 
     public AddLight(light: Light) {
-        this.light = light;
+        // this.lights = light;
+        // this.lights.push(light);
+        if (light instanceof DirectionalLight) {
+            this.directionalLights.push(light);
+        }
+        if (light instanceof PointLight) {
+            this.pointLights.push(light);
+        }
     }
 
     public Add(sObject: SceneObject) {
@@ -101,7 +112,15 @@ export class Scene {
         return this.renderCamera;
     }
 
-    public get Light(): Light | null {
-        return this.light;
+    public get DirectionalLights(): DirectionalLight[] {
+        return this.directionalLights;
+    }
+
+    public get PointLights(): PointLight[] {
+        return this.pointLights;
+    }
+
+    public get Lights(): Light[] {
+        return [...this.directionalLights, ...this.pointLights];
     }
 }

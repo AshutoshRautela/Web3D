@@ -128,7 +128,6 @@ export class PhoneShadingMaterial {
      * Applying Material
      */
     public onUpdate(): void {
-        console.log("Color U: ", this.uniformColor);
         this.gl2.uniform4fv(this.uniformColor, this.color);
         this.gl2.uniform1f(this.uniformAmbience, this.ambience)
         this.gl2.uniform1f(this.uniformDiffuse, this.diffuse);

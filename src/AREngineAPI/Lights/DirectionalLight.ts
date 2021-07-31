@@ -26,7 +26,24 @@ export class DirectionalLight extends Light {
         return this;
     }
 
-    public get Direction() {
+    /**
+     * Directional Light Color
+     */
+     public get Color(): vec3 {
+        return this.color;
+    }
+
+    /**
+     * Directional Light Direction
+     */
+    public get Direction(): vec3 {
         return this.direction;
+    }
+
+    /**
+     * Directional Light Intensity
+     */
+     public get Intensity(): number {
+        return this.intensity;
     }
 }
