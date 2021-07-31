@@ -1,5 +1,6 @@
 #version 300 es
 
+#define MAX_LIGHTS 50
 precision mediump float;
 
 in vec3 vNormal;
@@ -9,6 +10,7 @@ out vec4 finalColor;
 
 uniform float u_time;
 uniform vec3 u_lightDir;
+uniform int totalLights;
 
 struct Material {
     vec4 color;
@@ -17,12 +19,14 @@ struct Material {
     float specular;
     float shininess;
 };
+uniform Material u_material;
 
 struct DirectionalLight {
     vec3 color;
     vec3 direction;
     float intensity;
 };
+
 uniform DirectionalLight u_dLight;
 
 struct SpotLight {
@@ -31,9 +35,9 @@ struct SpotLight {
     vec3 intensity;
 };
 uniform SpotLight u_sLight;
+uniform SpotLight u_sLights[MAX_LIGHTS];
 
 float lightRange = 10.;
-Material material = Material(vec4(1 , 0 , 0 , 1), 0.3 , 0.4, 0.2, 20.);
 
 vec3 getAmbience(Material material) {
     return material.color.xyz * material.ambience;
@@ -64,9 +68,9 @@ void main() {
     vec3 lightDir = normalize(u_sLight.position - fragPos);
 
 
-    vec3 ambience = getAmbience(material) * lightAttenuation;
-    vec3 diffuse = getDiffuse(material, vNormal, lightDir) * lightAttenuation;
-    vec3 specular = getSpecular(material, vNormal, lightDir) * lightAttenuation;
+    vec3 ambience = getAmbience(u_material) * lightAttenuation;
+    vec3 diffuse = getDiffuse(u_material, vNormal, lightDir) * lightAttenuation;
+    vec3 specular = getSpecular(u_material, vNormal, lightDir) * lightAttenuation;
     
     vec3 compColor = ambience + diffuse + specular;
     finalColor = vec4(compColor, 1.);

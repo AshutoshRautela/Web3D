@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec3, vec4 } from 'gl-matrix';
 import { Camera } from './AREngineAPI/Camera';
 import { DirectionalLight } from './AREngineAPI/Lights/DirectionalLight';
 import { Light } from './AREngineAPI/Lights/Light';
@@ -38,7 +38,7 @@ const updateEngine = () => {
     // base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
 
-    // cube.Transform.Rotate(vec3.fromValues(0, 0.04, 0));
+    base.Material.setColor(vec4.fromValues(1 , Math.sin(time) + 1 , 1 , 1 ));
     window.requestAnimationFrame(updateEngine);
 }
 

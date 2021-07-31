@@ -1,6 +1,7 @@
 import { mat4 } from "gl-matrix";
 import { DirectionalLight } from "../Lights/DirectionalLight";
 import { SpotLight } from "../Lights/SpotLight";
+import { PhoneShadingMaterial } from "../Materials/PhongShadingMaterial";
 import { Mesh } from "../Mesh";
 import { Scene } from "../Scene";
 import { SceneObject } from "../SceneObject";
@@ -19,7 +20,6 @@ export class Cube extends SceneObject {
 
     private lightDirUniformLocation: WebGLUniformLocation | null;
     private lightPosUniformLocation: WebGLUniformLocation | null;
-
 
     constructor(scene3D: Scene) {
         super(scene3D);
@@ -46,6 +46,8 @@ export class Cube extends SceneObject {
 
         this.lightDirUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLight.direction');
         this.lightPosUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_sLight.position');
+
+        this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 
     onRender(deltaTime: number) {
@@ -67,6 +69,7 @@ export class Cube extends SceneObject {
                 this.gl2.uniform3fv(this.lightPosUniformLocation, (this.scene3D.Light as SpotLight).Position);
             }
 
+            this.material.onUpdate();
             this.mesh.draw();
         }
     }

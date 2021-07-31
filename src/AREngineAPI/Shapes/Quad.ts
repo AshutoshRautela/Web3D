@@ -1,6 +1,7 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { DirectionalLight } from '../Lights/DirectionalLight';
 import { SpotLight } from '../Lights/SpotLight';
+import { PhoneShadingMaterial } from '../Materials/PhongShadingMaterial';
 import { Mesh } from '../Mesh';
 import { Scene } from '../Scene';
 import { SceneObject, Vector3 } from '../SceneObject';
@@ -37,6 +38,7 @@ export class Quad extends SceneObject {
         this.lightPosUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_sLight.position');
 
         console.log("Light Direction: ", this.lightDirUniformLocation);
+        this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 
     onRender(deltaTime: number) {
@@ -57,6 +59,8 @@ export class Quad extends SceneObject {
             } else if (this.scene3D.Light instanceof SpotLight) {
                 this.gl2.uniform3fv(this.lightPosUniformLocation, (this.scene3D.Light as SpotLight).Position);
             }
+
+            this.material.onUpdate();
             this.mesh.draw();
         }
     }
