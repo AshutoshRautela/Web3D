@@ -43,7 +43,5 @@
   },
   "dependencies": {
     "gl-matrix": "^3.3.0",
-    "rxjs": "^7.2.0",
-    "tsm": "^1.0.1"
   }
 }
