@@ -1,5 +1,5 @@
-import { vec2, vec3, vec4 } from "gl-matrix";
-import { Light } from "./Light";
+import { vec2, vec3, vec4 } from 'gl-matrix';
+import { Light } from './Light';
 
 export class DirectionalLight extends Light {
 

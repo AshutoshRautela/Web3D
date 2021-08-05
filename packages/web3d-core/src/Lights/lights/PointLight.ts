@@ -1,6 +1,6 @@
-import { vec3, vec4 } from "gl-matrix";
-import { Transform } from "../Transform";
-import { Light } from "./Light";
+import { vec3, vec4 } from 'gl-matrix';
+import { Transform } from '../../Transform'
+import { Light } from './Light';
 
 export class PointLight extends Light {
 

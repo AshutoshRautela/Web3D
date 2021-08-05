@@ -1,8 +1,8 @@
 
-import { EngineLifecycle } from "./EngineLifeCycle";
-import { PhoneShadingMaterial } from "./Materials/PhongShadingMaterial";
-import { Scene } from "./Scene";
-import { Transform } from "./Transform";
+import { EngineLifecycle } from './EngineLifeCycle';
+import { PhoneShadingMaterial } from './Materials';
+import { Scene } from './Scene';
+import { Transform } from './Transform';
 
 export abstract class SceneObject implements EngineLifecycle {
 

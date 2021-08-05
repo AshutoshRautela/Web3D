@@ -1,7 +1,5 @@
 import { Camera } from './Camera';
-import { DirectionalLight } from './Lights/DirectionalLight';
-import { Light } from './Lights/Light';
-import { PointLight } from './Lights/PointLight';
+import { DirectionalLight, Light, PointLight } from './Lights'
 import { SceneObject } from './SceneObject';
 export class Scene {
 

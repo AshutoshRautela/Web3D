@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "sourceMap": true,
     "noImplicitAny": true,
-    "module": "commonjs",
+    "module": "es6",
     "target": "es5",
+    "jsx": "react",
+    "allowJs": true,
+    "moduleResolution": "node",
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "skipLibCheck": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
-  },
-  "include": [
-    "src/**/*"
-  ]
+      "ES2019",
+      "DOM"
+    ]
+  }
 }

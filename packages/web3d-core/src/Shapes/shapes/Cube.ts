@@ -1,12 +1,11 @@
-import { mat4 } from "gl-matrix";
-import { DirectionalLight } from "../Lights/DirectionalLight";
-import { PointLight } from "../Lights/PointLight";
-import { PhoneShadingMaterial } from "../Materials/PhongShadingMaterial";
-import { Mesh } from "../Mesh";
-import { Scene } from "../Scene";
-import { SceneObject } from "../SceneObject";
-import { Shader } from "../Shader";
-import { Transform } from "../Transform";
+import { mat4 } from 'gl-matrix';
+import { DirectionalLight, PointLight } from '../../Lights';
+import { PhoneShadingMaterial } from '../../Materials';
+import { Mesh } from '../../Mesh';
+import { Scene } from '../../Scene';
+import { SceneObject } from '../../SceneObject';
+import { Shader } from '../../Shader';
+import { Transform } from '../../Transform';
 
 export class Cube extends SceneObject {
 
@@ -36,17 +35,17 @@ export class Cube extends SceneObject {
 
         this.transform = new Transform();
         this.shader = new Shader(this.gl2,
-            require('../shaders/vertMvp/vert.glsl'),
-            require('../shaders/vertMvp/frag.glsl')
+            require('../../shaders/vertMvp/vert.glsl'),
+            require('../../shaders/vertMvp/frag.glsl')
         );
         if (!this.shader.ShaderProgram) {
-            throw new Error("Error Loading Shader Program");
+            throw new Error('Error Loading Shader Program');
         }
 
         this.mesh = new Mesh(
             this.scene3D,
             this.shader.ShaderProgram,
-            require('../MeshFiles/CubeMesh.json')
+            require('../../MeshFiles/CubeMesh.json')
         );
         this.mesh.onInit();
 
@@ -71,7 +70,7 @@ export class Cube extends SceneObject {
             this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
         });        
 
-        console.log("Light Colors uniform", this.uniformPLightsColor);
+        console.log('Light Colors uniform', this.uniformPLightsColor);
         this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 

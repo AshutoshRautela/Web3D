@@ -1,11 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera } from './AREngineAPI/Camera';
-import { DirectionalLight } from './AREngineAPI/Lights/DirectionalLight';
-import { Light } from './AREngineAPI/Lights/Light';
-import { PointLight } from './AREngineAPI/Lights/PointLight';
-import { Scene } from './AREngineAPI/Scene';
-import { Cube } from './AREngineAPI/Shapes/Cube';
-import { Quad } from './AREngineAPI/Shapes/Quad';
+import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Transform } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -89,20 +83,22 @@ const addModels = () => {
 canvasRef = document.createElement('canvas');
 canvasRef.width = arEngineSize.width;
 canvasRef.height = arEngineSize.height;
-const aspectRatio = 16/9;
 document.body.appendChild(canvasRef);
 
 console.log('Main Running');
 
 if (canvasRef) {
     console.log("Screen Res: ", window.innerWidth, window.innerHeight);
-    if (window.innerWidth > window.innerHeight) {
-        canvasRef.width = window.innerWidth;
-        canvasRef.height = canvasRef.width / aspectRatio;
-    } else {
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    if (window.innerHeight < window.innerWidth) {
+        console.log("Height is less");
         canvasRef.height = window.innerHeight;
         canvasRef.width = aspectRatio * canvasRef.height;
+    }  else if (window.innerHeight >= window.innerWidth) {
+        canvasRef.width = window.innerWidth;
+        canvasRef.height = canvasRef.width / aspectRatio;
     }
+
     arEngineSize.width = canvasRef.width;
     arEngineSize.height = canvasRef.height;
 

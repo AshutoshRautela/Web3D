@@ -1,12 +1,11 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { DirectionalLight } from '../Lights/DirectionalLight';
-import { PointLight } from '../Lights/PointLight';
-import { PhoneShadingMaterial } from '../Materials/PhongShadingMaterial';
-import { Mesh } from '../Mesh';
-import { Scene } from '../Scene';
-import { SceneObject, Vector3 } from '../SceneObject';
-import { Shader } from '../Shader';
-import { Transform } from '../Transform';
+import { DirectionalLight, PointLight } from '../../Lights';
+import { PhoneShadingMaterial } from '../../Materials';
+import { Mesh } from '../../Mesh';
+import { Scene } from '../../Scene';
+import { SceneObject } from '../../SceneObject';
+import { Shader } from '../../Shader';
+import { Transform } from '../../Transform';
 export class Quad extends SceneObject {
 
     private shader!: Shader;
@@ -31,12 +30,12 @@ export class Quad extends SceneObject {
     constructor(scene3D: Scene) {
         super(scene3D);
         this.transform = new Transform();
-        this.shader = new Shader(this.gl2, require('../shaders/vertMvp/vert.glsl'), require('../shaders/vertMvp/frag.glsl'));
+        this.shader = new Shader(this.gl2, require('../../shaders/vertMvp/vert.glsl'), require('../../shaders/vertMvp/frag.glsl'));
         if (!this.shader.ShaderProgram) {
             throw "Failed to create Shader for QUad";
         }
 
-        this.mesh = new Mesh(this.scene3D, this.shader.ShaderProgram, require('../MeshFiles/QuadMesh_D.json'));
+        this.mesh = new Mesh(this.scene3D, this.shader.ShaderProgram, require('../../MeshFiles/QuadMesh_D.json'));
         this.mesh.onInit();
 
         this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
