@@ -84,12 +84,12 @@ export class Cube extends SceneObject {
 
             this.gl2.useProgram(this.shader.ShaderProgram);
 
-            this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500 );
+            this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500);
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
             this.gl2.uniformMatrix4fv(this.modelUniformLocation, false, this.transform.ModelMatrix);
             
             if (this.scene3D.PointLights.length > 0) {
-                this.gl2.uniform1f(this.uniformPLightsCount, this.scene3D.PointLights.length);
+                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length );
                 this.scene3D.PointLights.forEach((pointLight: PointLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformPLightsColor[index], pointLight.Color);
                     this.gl2.uniform3fv(this.uniformPLightsPosition[index], pointLight.Position);
@@ -98,7 +98,7 @@ export class Cube extends SceneObject {
                 });
             };
             if (this.scene3D.DirectionalLights.length > 0) {
-                this.gl2.uniform1f(this.uniformDLightsCount, this.scene3D.DirectionalLights.length);
+                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length );
                 this.scene3D.DirectionalLights.forEach((directionLight: DirectionalLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformDLightsColor[index], directionLight.Color);
                     this.gl2.uniform3fv(this.uniformDLightsDirection[index], directionLight.Direction);

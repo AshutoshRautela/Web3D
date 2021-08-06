@@ -35,7 +35,7 @@ uniform DirectionalLights u_dLights;
 struct PointLight {
     vec3 color;
     vec3 position;
-    vec3 intensity;
+    float intensity;
 
     vec3 attenuationCoeff;
 };

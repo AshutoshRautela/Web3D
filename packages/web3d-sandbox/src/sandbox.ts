@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Transform } from 'web3d-core';
+import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, UVSphereCreator, Sphere } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -14,6 +14,8 @@ let quad: Quad;
 let cube: Cube;
 
 let base: Quad;
+
+let uvSphere: Sphere;
 
 const arEngineSize = {
     width: 843,
@@ -31,6 +33,8 @@ const updateEngine = () => {
 
     (pointLight1 as PointLight).setPosition(vec3.fromValues(1, 3, Math.cos(time) * 10 + 8));
     (pointLight2 as PointLight).setPosition(vec3.fromValues(Math.cos(time) * 10, 3, 8));
+
+    uvSphere.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2, Math.cos(time) * 2 + 4, 3.0));
 
     // base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
@@ -73,9 +77,15 @@ const addModels = () => {
         .setPosition(vec3.fromValues(0, 0, 10))
         .setScale(vec3.fromValues(20, 15, 1));
     base.Material.setColor(vec4.fromValues( 1 , 1 , 1, 1.0 ));
-        
+
+    uvSphere = new Sphere(scene3D);
+    uvSphere.Transform.setPosition(vec3.fromValues(0, 5 , 10));
 
     scene3D.Add(base);
+    scene3D.Add(uvSphere);
+
+    // const sphereGeometry = UVSphereCreator.createGeometry(1, 5);
+    // console.log("Sphere Geometry: ", JSON.stringify(sphereGeometry, null, 2));
 
     camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
 }
