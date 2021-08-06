@@ -2,6 +2,10 @@
 
 Web3D is a 3D Rendering Framework based on WebGL. This project is currently work in progress
 
+The project is managed into modules.
+1. web3d-core 
+2. web3d-sandbox
+
 ![](images/Render1.png) 
 
 
@@ -20,9 +24,9 @@ Install the node modules
   yarn
 ```
 
-Run the webpack dev server
+To run the sandbox
 ```
-  yarn start
+  yarn start:sandbox
 ```
 
 
