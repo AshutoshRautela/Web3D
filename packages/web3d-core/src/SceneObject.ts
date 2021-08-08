@@ -10,10 +10,6 @@ export abstract class SceneObject implements EngineLifecycle {
     public onDestroy?(): void;
     public onRender?(deltaTime?: number): void;
 
-    public onKeyDown?(keyEvent: KeyboardEvent): void;
-    public onKeyPress?(keyEvent: KeyboardEvent): void;
-    public onKeyUp?(keyEvent: KeyboardEvent): void;
-
     protected transform: Transform;
     protected material: PhoneShadingMaterial;
     protected gl2: WebGL2RenderingContext;
