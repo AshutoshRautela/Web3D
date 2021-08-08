@@ -1,5 +1,8 @@
 import { vec3, vec4 } from 'gl-matrix';
 import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode } from 'web3d-core';
+import { Inspector } from 'web3d-editor';
+import ReactDOM from 'react-dom';
+import React from 'react';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -125,6 +128,7 @@ if (canvasRef) {
     arEngineSize.height = canvasRef.height;
 
     Input.activateInputSystem();
+    // ReactDOM.render(<Inspector></Inspector>, document.getElementById("editor"));
 
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);
@@ -133,4 +137,3 @@ if (canvasRef) {
     window.requestAnimationFrame(updateEngine);
     addModels();
 }
-

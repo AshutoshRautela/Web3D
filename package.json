@@ -12,7 +12,8 @@
   "author": "Ashutosh Rautela",
   "workspaces": [
     "packages/web3d-core",
-    "packages/web3d-sandbox"
+    "packages/web3d-sandbox",
+    "packages/web3d-editor"
   ],
   "devDependencies": {
     "@types/node": "7.0.0",

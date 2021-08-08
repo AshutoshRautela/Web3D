@@ -1,13 +1,13 @@
 const path = require("path");
 
-const ROOT = path.resolve(__dirname, "src");
+const ROOT = path.resolve(__dirname);
 const DESTINATION = path.resolve(__dirname, "dist");
 
 module.exports = {
   context: ROOT,
 
   entry: {
-    main: "./sandbox.tsx",
+    main: "./index.ts",
   },
 
   output: {
@@ -29,11 +29,6 @@ module.exports = {
         test: /\.(ts|tsx)$/,
         exclude: [/node_modules/],
         use: "ts-loader",
-      },
-      {
-        test: /\.glsl/,
-        exclude: [/node_modules/],
-        use: "webpack-glsl-loader",
       },
       {
         test: /\.s[ac]ss/,

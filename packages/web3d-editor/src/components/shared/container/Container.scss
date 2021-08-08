@@ -1,0 +1,12 @@
+@import "../../../sass/abstracts/variables.scss";
+@import "..//../../sass/abstracts/mixins.scss";
+
+.container {
+    @include text;
+    background-color: $primary-color;
+
+    & .header {
+        background-color: $primary-color-dark;
+        padding: 0.3rem 0.3rem 0.3rem 0.8rem;
+    }
+}
