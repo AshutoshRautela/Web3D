@@ -1,9 +1,10 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, UVSphereCreator, Sphere } from 'web3d-core';
+import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
 let camera: Camera;
+let cameraSpeed: number = 0.2;
 let directionalLight: Light;
 
 let pointLight1: Light;
@@ -39,6 +40,24 @@ const updateEngine = () => {
     // base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
 
+    if (Input.IsKeyPressed(KeyCode.A)) {
+        camera.Transform.Translate(vec3.fromValues(-cameraSpeed , 0 , 0));
+    }
+    if (Input.IsKeyPressed(KeyCode.D)) {
+        camera.Transform.Translate(vec3.fromValues(cameraSpeed , 0 , 0));
+    }
+    if (Input.IsKeyPressed(KeyCode.W)) {
+        camera.Transform.Translate(vec3.fromValues(0 , 0 , cameraSpeed));
+    }
+    if (Input.IsKeyPressed(KeyCode.S)) {
+        camera.Transform.Translate(vec3.fromValues(0 , 0 , -cameraSpeed));
+    }
+    if (Input.IsKeyPressed(KeyCode.E)) {
+        camera.Transform.Translate(vec3.fromValues(0 , cameraSpeed, 0));
+    }
+    if (Input.IsKeyPressed(KeyCode.Q)) {
+        camera.Transform.Translate(vec3.fromValues(0 , -cameraSpeed, 0));
+    }
     window.requestAnimationFrame(updateEngine);
 }
 
@@ -84,9 +103,6 @@ const addModels = () => {
     scene3D.Add(base);
     scene3D.Add(uvSphere);
 
-    // const sphereGeometry = UVSphereCreator.createGeometry(1, 5);
-    // console.log("Sphere Geometry: ", JSON.stringify(sphereGeometry, null, 2));
-
     camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
 }
 
@@ -95,13 +111,9 @@ canvasRef.width = arEngineSize.width;
 canvasRef.height = arEngineSize.height;
 document.body.appendChild(canvasRef);
 
-console.log('Main Running');
-
 if (canvasRef) {
-    console.log("Screen Res: ", window.innerWidth, window.innerHeight);
     const aspectRatio = window.innerWidth / window.innerHeight;
     if (window.innerHeight < window.innerWidth) {
-        console.log("Height is less");
         canvasRef.height = window.innerHeight;
         canvasRef.width = aspectRatio * canvasRef.height;
     }  else if (window.innerHeight >= window.innerWidth) {
@@ -111,6 +123,8 @@ if (canvasRef) {
 
     arEngineSize.width = canvasRef.width;
     arEngineSize.height = canvasRef.height;
+
+    Input.activateInputSystem();
 
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);

@@ -61,26 +61,6 @@ export class Camera extends SceneObject {
         return vMatrix;
     }
 
-    onKeyPress(event: KeyboardEvent) {
-        const step = 0.1;
-        if (event.key === 'w') {
-            this.transform.Translate(vec3.fromValues(0 , 0 , 1 * step));
-        }
-        else if (event.key === 'a') {
-            this.transform.Translate(vec3.fromValues(-1 * step, 0 , 0));
-        }
-        else if (event.key === 'd') {
-            this.transform.Translate(vec3.fromValues(1 * step , 0 , 0));
-        }
-        else if (event.key === 's') {
-            this.transform.Translate(vec3.fromValues(0 , 0 , -1 * step));
-        } else if (event.key === 'e') {
-            this.transform.Translate(vec3.fromValues(0 , 1 * step, 0));
-        } else if (event.key === 'q') {
-            this.transform.Translate(vec3.fromValues(0 , -1 * step, 0));
-        }
-    }
-
     public get ViewMatrix(): mat4 {
         return this.viewMatrix;
     }

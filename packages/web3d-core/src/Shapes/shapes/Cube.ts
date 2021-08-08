@@ -16,9 +16,7 @@ export class Cube extends SceneObject {
     private mvpUniformLocation!: WebGLUniformLocation | null;
     private modelUniformLocation: WebGLUniformLocation | null;
 
-    private lightDirUniformLocation: WebGLUniformLocation | null;
-    private lightPosUniformLocation: WebGLUniformLocation | null;
-
+    
     private uniformDLightsCount: WebGLUniformLocation;
     private uniformDLightsColor: WebGLUniformLocation[] = [];
     private uniformDLightsDirection: WebGLUniformLocation[] = [];
@@ -52,9 +50,7 @@ export class Cube extends SceneObject {
         this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
         this.mvpUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_mvp');
         this.modelUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_model');
-
-        // this.lightDirUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLight.direction');
-        // this.lightPosUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_sLight.position');
+        
         this.uniformDLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLights.numLights');
         this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
             this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].color`));
@@ -70,7 +66,6 @@ export class Cube extends SceneObject {
             this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
         });        
 
-        console.log('Light Colors uniform', this.uniformPLightsColor);
         this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 

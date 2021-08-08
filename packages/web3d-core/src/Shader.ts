@@ -16,9 +16,6 @@ export class Shader implements EngineLifecycle {
         this.vShader = this.compileShader(ShaderType.VERTEX);
         this.fShader = this.compileShader(ShaderType.FRAGMENT);
         this.shaderProgram = this.createShaderProgram();
-        if (this.shaderProgram) {
-            console.log('Successfully compiled shader');
-        }
     }
 
     private compileShader(shaderType: ShaderType): WebGLShader | null {

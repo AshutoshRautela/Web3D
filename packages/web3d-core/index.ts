@@ -11,3 +11,4 @@ export * from './src/Shapes';
 export * from './src/Materials';
 export * from './src/Lights';
 export * from './src/GeometryCreator';
+export * from './src/Input';
