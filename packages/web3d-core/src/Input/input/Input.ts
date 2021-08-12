@@ -34,11 +34,11 @@ export class Input {
     private static keyPressed: Map<number, boolean>;
 
     private static onKeyDown = (event: KeyboardEvent) => {
-        Input.keyPressed.set(event.key.charCodeAt(0), true);
+        Input.keyPressed.set(event.key.charCodeAt(0)^32, true);
     }
 
     private static onKeyUp = (event: KeyboardEvent) => {
-        Input.keyPressed.set(event.key.charCodeAt(0), false);
+        Input.keyPressed.set(event.key.charCodeAt(0)^32, false);
     }
     
     public static activateInputSystem() {
@@ -54,6 +54,6 @@ export class Input {
     }
 
     public static IsKeyPressed(keyCode: KeyCode): boolean {
-        return Input.keyPressed.get(keyCode) || Input.keyPressed.get(keyCode^32) ? true : false;
+        return Input.keyPressed.get(keyCode);
     }
 }

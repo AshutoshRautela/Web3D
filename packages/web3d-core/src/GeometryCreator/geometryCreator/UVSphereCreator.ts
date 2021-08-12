@@ -4,9 +4,6 @@ import { MeshData } from "../../interfaces";
 import { Util } from "../../Util";
 
 export class UVSphereCreator {
-    constructor() {
-
-    }
 
     public static createGeometry(radius = 1, step = 20): MeshData {
         const vertices: number[][] = [];
@@ -44,13 +41,7 @@ export class UVSphereCreator {
             let p1 = i; let p2 = i - pArr; let p3 = ( i - pArr ) + 1;
             let pp1 = i; let pp2 = ( i - pArr ) + 1; let pp3 = i + 1;
 
-            indices.push(p1);
-            indices.push(p2);
-            indices.push(p3);
-
-            indices.push(pp1);
-            indices.push(pp2);
-            indices.push(pp3);
+            indices.push(...[p1, p2, p3, pp1, pp2, pp3]);
         }
 
         return { vertices, indices, normals };

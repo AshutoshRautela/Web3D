@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode } from 'web3d-core';
+import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode, ConeCreator, Cone } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -17,6 +17,7 @@ let cube: Cube;
 let base: Quad;
 
 let uvSphere: Sphere;
+let cone: Cone;
 
 const arEngineSize = {
     width: 843,
@@ -40,6 +41,10 @@ const updateEngine = () => {
     // base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
 
+    cone.Transform.setScale(vec3.fromValues(Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3));
+    cone.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2 , 1 , 10));
+    cone.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 1000, 0 , 0));
+
     if (Input.IsKeyPressed(KeyCode.A)) {
         camera.Transform.Translate(vec3.fromValues(-cameraSpeed , 0 , 0));
     }
@@ -51,6 +56,7 @@ const updateEngine = () => {
     }
     if (Input.IsKeyPressed(KeyCode.S)) {
         camera.Transform.Translate(vec3.fromValues(0 , 0 , -cameraSpeed));
+        console.log("S Pressed");
     }
     if (Input.IsKeyPressed(KeyCode.E)) {
         camera.Transform.Translate(vec3.fromValues(0 , cameraSpeed, 0));
@@ -103,6 +109,10 @@ const addModels = () => {
     scene3D.Add(base);
     scene3D.Add(uvSphere);
 
+    cone = new Cone(scene3D);
+    cone.Transform.setPosition(vec3.fromValues(0 , 5 , 10));
+    scene3D.Add(cone);
+
     camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
 }
 
@@ -125,6 +135,9 @@ if (canvasRef) {
     arEngineSize.height = canvasRef.height;
 
     Input.activateInputSystem();
+
+    // const coneMesh = ConeCreator.createGeometry();
+    // console.log("Cone Mesh: ", JSON.stringify(coneMesh, null, 2));
 
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);
