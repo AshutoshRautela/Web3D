@@ -8,13 +8,14 @@ import {
         Input,
         KeyCode, 
         Primitive,
-        PrimitiveType
+        PrimitiveType,
+        MouseButton
      } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
 let camera: Camera;
-let cameraSpeed: number = 0.2;
+let cameraSpeed: number = 0.01;
 let directionalLight: Light;
 
 let pointLight1: Light;
@@ -53,24 +54,34 @@ const updateEngine = () => {
     cylinder.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 80, 0, 0));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
-        camera.Transform.Translate(vec3.fromValues(-cameraSpeed , 0 , 0));
+        camera.Transform.Translate(vec3.fromValues(-cameraSpeed * 10, 0 , 0));
     }
     if (Input.IsKeyPressed(KeyCode.D)) {
-        camera.Transform.Translate(vec3.fromValues(cameraSpeed , 0 , 0));
+        camera.Transform.Translate(vec3.fromValues(cameraSpeed * 10, 0 , 0));
     }
     if (Input.IsKeyPressed(KeyCode.W)) {
-        camera.Transform.Translate(vec3.fromValues(0 , 0 , cameraSpeed));
+        camera.Transform.Translate(vec3.fromValues(0 , 0 , cameraSpeed * 10));
     }
     if (Input.IsKeyPressed(KeyCode.S)) {
-        camera.Transform.Translate(vec3.fromValues(0 , 0 , -cameraSpeed));
+        camera.Transform.Translate(vec3.fromValues(0 , 0 , -cameraSpeed * 10));
         console.log("S Pressed");
     }
     if (Input.IsKeyPressed(KeyCode.E)) {
-        camera.Transform.Translate(vec3.fromValues(0 , cameraSpeed, 0));
+        camera.Transform.Translate(vec3.fromValues(0 , cameraSpeed * 10, 0));
     }
     if (Input.IsKeyPressed(KeyCode.Q)) {
-        camera.Transform.Translate(vec3.fromValues(0 , -cameraSpeed, 0));
+        camera.Transform.Translate(vec3.fromValues(0 , -cameraSpeed * 10, 0));
     }
+
+    if (Input.IsMouseDown(MouseButton.Middle)?.isDown) {
+        const { delta } = Input.IsMouseDown(MouseButton.Middle);
+        camera.Transform.Translate(vec3.fromValues(-delta[0] * cameraSpeed, delta[1] * cameraSpeed, 0));
+    }
+
+    if (Input.OnMouseWheel()?.isWheeling) {
+        camera.Transform.Translate(vec3.fromValues(0 , 0, Input.OnMouseWheel().wheelValue * 0.01));
+    }
+
     window.requestAnimationFrame(updateEngine);
 }
 
