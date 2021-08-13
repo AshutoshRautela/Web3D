@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode, ConeCreator, Cone } from 'web3d-core';
+import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode, CylinderCreator, Cone, Cylinder } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -18,6 +18,7 @@ let base: Quad;
 
 let uvSphere: Sphere;
 let cone: Cone;
+let cylinder: Cylinder;
 
 const arEngineSize = {
     width: 843,
@@ -43,7 +44,8 @@ const updateEngine = () => {
 
     cone.Transform.setScale(vec3.fromValues(Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3));
     cone.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2 , 1 , 10));
-    cone.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 1000, 0 , 0));
+    // cone.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 1000, 0 , 0));
+    cylinder.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 80, 0, 0));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
         camera.Transform.Translate(vec3.fromValues(-cameraSpeed , 0 , 0));
@@ -113,6 +115,10 @@ const addModels = () => {
     cone.Transform.setPosition(vec3.fromValues(0 , 5 , 10));
     scene3D.Add(cone);
 
+    cylinder = new Cylinder(scene3D);
+    cylinder.Transform.setPosition(vec3.fromValues(0 , 5 , 5));
+    scene3D.Add(cylinder);
+
     camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
 }
 
@@ -136,8 +142,8 @@ if (canvasRef) {
 
     Input.activateInputSystem();
 
-    // const coneMesh = ConeCreator.createGeometry();
-    // console.log("Cone Mesh: ", JSON.stringify(coneMesh, null, 2));
+    // const cylinderMesh = CylinderCreator.createGeometry();
+    // console.log(JSON.stringify(cylinderMesh, null, 2));
 
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);
