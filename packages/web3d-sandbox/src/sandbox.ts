@@ -1,5 +1,15 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { Camera, Cube, DirectionalLight, Light, PointLight, Quad, Scene, Input, Sphere, KeyCode, CylinderCreator, Cone, Cylinder } from 'web3d-core';
+import {
+        Camera,
+        DirectionalLight,
+        Light, 
+        PointLight, 
+        Scene,
+        Input,
+        KeyCode, 
+        Primitive,
+        PrimitiveType
+     } from 'web3d-core';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -11,14 +21,13 @@ let pointLight1: Light;
 let pointLight2: Light;
 
 // Elements in Scene
-let quad: Quad;
-let cube: Cube;
+let cube: Primitive;
 
-let base: Quad;
+let base: Primitive;
 
-let uvSphere: Sphere;
-let cone: Cone;
-let cylinder: Cylinder;
+let uvSphere: Primitive;
+let cone: Primitive;
+let cylinder: Primitive;
 
 const arEngineSize = {
     width: 843,
@@ -31,20 +40,16 @@ const updateEngine = () => {
 
     cube.Transform.setPosition(vec3.fromValues(0, 5, Math.sin(time) * 8 + 10));
     cube.Transform.setEulerAngles(vec3.fromValues(0, Math.sin(time) * 200, 0));
-    quad.Transform.setEulerAngles(vec3.fromValues(0, Math.sin(time) * 200, 0));
-    // quad.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2, Math.cos(time) * 1.5 + 3, 4));
 
     (pointLight1 as PointLight).setPosition(vec3.fromValues(1, 3, Math.cos(time) * 10 + 8));
     (pointLight2 as PointLight).setPosition(vec3.fromValues(Math.cos(time) * 10, 3, 8));
 
     uvSphere.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2, Math.cos(time) * 2 + 4, 3.0));
 
-    // base.Transform.setEulerAngles(vec3.fromValues(Math.sin(time * 2) * 5 + 95, 0 , 0 ));
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
 
     cone.Transform.setScale(vec3.fromValues(Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3));
     cone.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2 , 1 , 10));
-    // cone.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 1000, 0 , 0));
     cylinder.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 80, 0, 0));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
@@ -87,35 +92,29 @@ const addLights = () => {
 const addModels = () => {
     addLights();
 
-    quad = new Quad(scene3D);
-    quad.Transform.setScale(vec3.fromValues(2, 2, 2))
-        .setEulerAngles(vec3.fromValues(0, 0, 0))
-        .setPosition((vec3.fromValues(0, 5, 10)));
-    // scene3D.Add(quad);
-
-    cube = new Cube(scene3D);
+    cube = Primitive.createPrimitive(scene3D, PrimitiveType.Cube);
     scene3D.Add(cube);
 
     cube.Transform.setPosition(vec3.fromValues(0, 0, 10))
         .setEulerAngles(vec3.fromValues(0, 0, 0));
 
-    base = new Quad(scene3D);
+    base = Primitive.createPrimitive(scene3D, PrimitiveType.Quad);
     base.Transform.setEulerAngles(vec3.fromValues(30, 0, 0))
         .setPosition(vec3.fromValues(0, 0, 10))
         .setScale(vec3.fromValues(20, 15, 1));
     base.Material.setColor(vec4.fromValues( 1 , 1 , 1, 1.0 ));
 
-    uvSphere = new Sphere(scene3D);
+    uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
     uvSphere.Transform.setPosition(vec3.fromValues(0, 5 , 10));
 
     scene3D.Add(base);
     scene3D.Add(uvSphere);
 
-    cone = new Cone(scene3D);
+    cone = Primitive.createPrimitive(scene3D, PrimitiveType.Cone);
     cone.Transform.setPosition(vec3.fromValues(0 , 5 , 10));
     scene3D.Add(cone);
 
-    cylinder = new Cylinder(scene3D);
+    cylinder = Primitive.createPrimitive(scene3D, PrimitiveType.Cylinder);
     cylinder.Transform.setPosition(vec3.fromValues(0 , 5 , 5));
     scene3D.Add(cylinder);
 

@@ -1,20 +1,27 @@
-import { mat4, vec3 } from 'gl-matrix';
-import { DirectionalLight, PointLight } from '../../Lights';
-import { PhoneShadingMaterial } from '../../Materials';
-import { Mesh } from '../../Mesh';
-import { Scene } from '../../Scene';
-import { SceneObject } from '../../SceneObject';
-import { Shader } from '../../Shader';
-import { Transform } from '../../Transform';
-export class Quad extends SceneObject {
+import { mat4 } from "gl-matrix";
+import { DirectionalLight, PointLight } from "../../Lights";
+import { PhoneShadingMaterial } from "../../Materials";
+import { Mesh } from "../../Mesh";
+import { Scene } from "../../Scene";
+import { SceneObject } from "../../SceneObject";
+import { Shader } from "../../Shader";
+import { Transform } from "../../Transform";
 
-    private shader!: Shader;
-    private mesh: Mesh;
+export enum PrimitiveType {
+    Cube,
+    Quad,
+    Sphere,
+    Cylinder,
+    Cone
+}
+
+export  class Primitive extends SceneObject {
 
     private timeUniformLocation!: WebGLUniformLocation | null;
     private mvpUniformLocation!: WebGLUniformLocation | null;
     private modelUniformLocation: WebGLUniformLocation | null;
 
+    
     private uniformDLightsCount: WebGLUniformLocation;
     private uniformDLightsColor: WebGLUniformLocation[] = [];
     private uniformDLightsDirection: WebGLUniformLocation[] = [];
@@ -26,22 +33,23 @@ export class Quad extends SceneObject {
     private uniformPLightsIntensity: WebGLUniformLocation[] = [];
     private uniformPLightsAttenC: WebGLUniformLocation[] = [];
 
-
-    constructor(scene3D: Scene) {
+    constructor(scene3D: Scene, private mesh: Mesh, private shader: Shader) {
         super(scene3D);
+
         this.transform = new Transform();
-        this.shader = new Shader(this.gl2, require('../../shaders/vertMvp/vert.glsl'), require('../../shaders/vertMvp/frag.glsl'));
         if (!this.shader.ShaderProgram) {
-            throw "Failed to create Shader for QUad";
+            throw new Error('Error Compiling Shader');
         }
-
-        this.mesh = new Mesh(this.scene3D, this.shader.ShaderProgram, require('../../MeshFiles/QuadMesh_D.json'));
         this.mesh.onInit();
+        this.initUniforms();
+        this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
+    }
 
+    private initUniforms() {
         this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
         this.mvpUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_mvp');
         this.modelUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_model');
-
+        
         this.uniformDLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLights.numLights');
         this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
             this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].color`));
@@ -55,15 +63,14 @@ export class Quad extends SceneObject {
             this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].position`));
             this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].intensity`));
             this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
-        });
-        this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
+        });       
     }
 
     onRender(deltaTime: number) {
         if (this.shader.ShaderProgram) {
             this.transform.onRender();
 
-            let mvMatrix: mat4 = mat4.create();
+            let mvMatrix: mat4 =  mat4.create();
             mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix);
             mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
 
@@ -72,10 +79,9 @@ export class Quad extends SceneObject {
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500);
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
             this.gl2.uniformMatrix4fv(this.modelUniformLocation, false, this.transform.ModelMatrix);
-
+            
             if (this.scene3D.PointLights.length > 0) {
-                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length);
-                // console.log("Point Lights: ", this.uniformPLightsCount, this.scene3D.PointLights.length);
+                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length );
                 this.scene3D.PointLights.forEach((pointLight: PointLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformPLightsColor[index], pointLight.Color);
                     this.gl2.uniform3fv(this.uniformPLightsPosition[index], pointLight.Position);
@@ -84,14 +90,13 @@ export class Quad extends SceneObject {
                 });
             };
             if (this.scene3D.DirectionalLights.length > 0) {
-                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length);
+                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length );
                 this.scene3D.DirectionalLights.forEach((directionLight: DirectionalLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformDLightsColor[index], directionLight.Color);
                     this.gl2.uniform3fv(this.uniformDLightsDirection[index], directionLight.Direction);
                     this.gl2.uniform1f(this.uniformDLightsIntensity[index], directionLight.Intensity);
                 });
             }
-
             this.material.onUpdate();
             this.mesh.draw();
         }
@@ -100,5 +105,74 @@ export class Quad extends SceneObject {
     onDestroy() {
         this.mesh.onDestroy();
         this.shader.onDestroy();
+    }
+
+    static createPrimitive(scene3D: Scene, primitiveType: PrimitiveType): Primitive {
+        let primitive: Primitive;
+        const shader = new Shader(scene3D.WebGLContext,
+            require('../../shaders/vertMvp/vert.glsl'),
+            require('../../shaders/vertMvp/frag.glsl')
+        );
+        if (primitiveType == PrimitiveType.Quad) {
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                require('../../MeshFiles/QuadMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader
+            );
+        }
+        else if (primitiveType == PrimitiveType.Cube) {
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                require('../../MeshFiles/CubeMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader
+            );
+        }
+        else if (primitiveType == PrimitiveType.Sphere) {
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                require('../../MeshFiles/UVSphereMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader
+            );
+        }
+        else if (primitiveType == PrimitiveType.Cone) {
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                require('../../MeshFiles/ConeMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader
+            );
+        }
+        else if (primitiveType == PrimitiveType.Cylinder) {
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                require('../../MeshFiles/CylinderMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader
+            );
+        }
+        return primitive;
     }
 }
