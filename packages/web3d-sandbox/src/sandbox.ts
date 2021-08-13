@@ -93,21 +93,21 @@ const addModels = () => {
     addLights();
 
     cube = Primitive.createPrimitive(scene3D, PrimitiveType.Cube);
-    scene3D.Add(cube);
-
+    
     cube.Transform.setPosition(vec3.fromValues(0, 0, 10))
-        .setEulerAngles(vec3.fromValues(0, 0, 0));
-
+    .setEulerAngles(vec3.fromValues(0, 0, 0));
+    
     base = Primitive.createPrimitive(scene3D, PrimitiveType.Quad);
     base.Transform.setEulerAngles(vec3.fromValues(30, 0, 0))
-        .setPosition(vec3.fromValues(0, 0, 10))
-        .setScale(vec3.fromValues(20, 15, 1));
+    .setPosition(vec3.fromValues(0, 0, 10))
+    .setScale(vec3.fromValues(20, 15, 1));
     base.Material.setColor(vec4.fromValues( 1 , 1 , 1, 1.0 ));
-
+    scene3D.Add(base);
+    
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
     uvSphere.Transform.setPosition(vec3.fromValues(0, 5 , 10));
-
-    scene3D.Add(base);
+    
+    scene3D.Add(cube);
     scene3D.Add(uvSphere);
 
     cone = Primitive.createPrimitive(scene3D, PrimitiveType.Cone);

@@ -31,11 +31,14 @@ export class Scene {
         this.renderableObjects = new Array<SceneObject>();
 
         this.gl2.viewport(0 , 0, this.size.WIDTH, this.size.HEIGHT);
+        this.gl2.enable(this.gl2.DEPTH_TEST);
+        this.gl2.depthFunc(this.gl2.LESS);
     }
 
     private clearCanvas() {
         this.gl2.clearColor(0.05, 0.05, 0.05, 1.0);
         this.gl2.clear(this.gl2.COLOR_BUFFER_BIT | this.gl2.DEPTH_BUFFER_BIT);
+        this.gl2.clearDepth(1);
         this.gl2.viewport(0, 0, this.size.WIDTH, this.size.HEIGHT);
     }
 
@@ -59,16 +62,20 @@ export class Scene {
     private lastTick = 0;
 
     public draw = () =>  {
-        this.gl2.enable(this.gl2.CULL_FACE);
-        this.gl2.frontFace(this.gl2.CW);
 
         this.clearCanvas();
+
+        this.gl2.enable(this.gl2.CULL_FACE);
+        this.gl2.frontFace(this.gl2.CW);
+        
+
         this.renderCamera.onRender();
 
         const deltaTime = performance.now() - this.lastTick;
         this.lastTick = performance.now();
 
         this.renderableObjects.forEach(rObject => rObject.onRender && rObject.onRender(deltaTime));
+
     }
 
     public get WebGLContext(): WebGL2RenderingContext {

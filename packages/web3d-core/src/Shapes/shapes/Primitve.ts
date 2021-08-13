@@ -20,7 +20,6 @@ export  class Primitive extends SceneObject {
     private timeUniformLocation!: WebGLUniformLocation | null;
     private mvpUniformLocation!: WebGLUniformLocation | null;
     private modelUniformLocation: WebGLUniformLocation | null;
-
     
     private uniformDLightsCount: WebGLUniformLocation;
     private uniformDLightsColor: WebGLUniformLocation[] = [];
@@ -33,7 +32,7 @@ export  class Primitive extends SceneObject {
     private uniformPLightsIntensity: WebGLUniformLocation[] = [];
     private uniformPLightsAttenC: WebGLUniformLocation[] = [];
 
-    constructor(scene3D: Scene, private mesh: Mesh, private shader: Shader) {
+    constructor(scene3D: Scene, private mesh: Mesh, private shader: Shader, private primitiveType: PrimitiveType) {
         super(scene3D);
 
         this.transform = new Transform();
@@ -122,7 +121,8 @@ export  class Primitive extends SceneObject {
             primitive = new Primitive(
                 scene3D,
                 mesh,
-                shader
+                shader,
+                primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cube) {
@@ -134,7 +134,8 @@ export  class Primitive extends SceneObject {
             primitive = new Primitive(
                 scene3D,
                 mesh,
-                shader
+                shader,
+                primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Sphere) {
@@ -146,7 +147,8 @@ export  class Primitive extends SceneObject {
             primitive = new Primitive(
                 scene3D,
                 mesh,
-                shader
+                shader,
+                primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cone) {
@@ -158,7 +160,8 @@ export  class Primitive extends SceneObject {
             primitive = new Primitive(
                 scene3D,
                 mesh,
-                shader
+                shader,
+                primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cylinder) {
@@ -170,7 +173,8 @@ export  class Primitive extends SceneObject {
             primitive = new Primitive(
                 scene3D,
                 mesh,
-                shader
+                shader,
+                primitiveType
             );
         }
         return primitive;

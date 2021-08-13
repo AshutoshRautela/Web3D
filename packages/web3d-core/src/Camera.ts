@@ -25,7 +25,7 @@ export class Camera extends SceneObject {
         this.lootAtPosition = vec3.create();
 
         this.transform.setPosition(vec3.fromValues(0 , 0 , -3));
-        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.00000000001, 1000);
+        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.1, 1000);
     }
 
     onRender() {
