@@ -30,6 +30,8 @@ let uvSphere: Primitive;
 let cone: Primitive;
 let cylinder: Primitive;
 
+let monkey: Primitive;
+
 const arEngineSize = {
     width: 843,
     height: 600
@@ -39,19 +41,11 @@ const updateEngine = () => {
     scene3D.draw();
     const time = (performance.now() / 10000) * 10;
 
-    cube.Transform.setPosition(vec3.fromValues(0, 5, Math.sin(time) * 8 + 10));
-    cube.Transform.setEulerAngles(vec3.fromValues(0, Math.sin(time) * 200, 0));
-
     (pointLight1 as PointLight).setPosition(vec3.fromValues(1, 3, Math.cos(time) * 10 + 8));
     (pointLight2 as PointLight).setPosition(vec3.fromValues(Math.cos(time) * 10, 3, 8));
 
-    uvSphere.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2, Math.cos(time) * 2 + 4, 3.0));
-
     base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
-
-    cone.Transform.setScale(vec3.fromValues(Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3, Math.sin(time) * 2 + 3));
-    cone.Transform.setPosition(vec3.fromValues(Math.sin(time) * 2 , 1 , 10));
-    cylinder.Transform.setEulerAngles(vec3.fromValues(Math.sin(time) * 80, 0, 0));
+    monkey.Transform.setPosition(vec3.fromValues(0, 3, Math.sin(time) * 5 + 4));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
         camera.Transform.Translate(vec3.fromValues(-cameraSpeed * 10, 0 , 0));
@@ -105,7 +99,7 @@ const addModels = () => {
 
     cube = Primitive.createPrimitive(scene3D, PrimitiveType.Cube);
     
-    cube.Transform.setPosition(vec3.fromValues(0, 0, 10))
+    cube.Transform.setPosition(vec3.fromValues(4.5, 1, 4))
     .setEulerAngles(vec3.fromValues(0, 0, 0));
     
     base = Primitive.createPrimitive(scene3D, PrimitiveType.Quad);
@@ -113,21 +107,27 @@ const addModels = () => {
     .setPosition(vec3.fromValues(0, 0, 10))
     .setScale(vec3.fromValues(20, 15, 1));
     base.Material.setColor(vec4.fromValues( 1 , 1 , 1, 1.0 ));
+
     scene3D.Add(base);
     
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
-    uvSphere.Transform.setPosition(vec3.fromValues(0, 5 , 10));
+    uvSphere.Transform.setPosition(vec3.fromValues(-5, 1 , 4));
     
     scene3D.Add(cube);
     scene3D.Add(uvSphere);
 
     cone = Primitive.createPrimitive(scene3D, PrimitiveType.Cone);
-    cone.Transform.setPosition(vec3.fromValues(0 , 5 , 10));
+    cone.Transform.setPosition(vec3.fromValues(3, 1, 8));
     scene3D.Add(cone);
 
     cylinder = Primitive.createPrimitive(scene3D, PrimitiveType.Cylinder);
-    cylinder.Transform.setPosition(vec3.fromValues(0 , 5 , 5));
+    cylinder.Transform.setPosition(vec3.fromValues(-3 , 1 , 8));
     scene3D.Add(cylinder);
+
+    monkey = Primitive.createPrimitive(scene3D, PrimitiveType.Monkey);
+    monkey.Transform.setPosition(vec3.fromValues(0 , 3 , 5));
+    monkey.Transform.setEulerAngles(vec3.fromValues(0 , 180, 0));
+    scene3D.Add(monkey);
 
     camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
 }

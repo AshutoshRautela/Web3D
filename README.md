@@ -6,7 +6,7 @@ The project is managed into modules.
 1. web3d-core 
 2. web3d-sandbox
 
-![](images/Render2.png) 
+![](images/Render5.png) 
 
 
 ![](images/Render4.png)

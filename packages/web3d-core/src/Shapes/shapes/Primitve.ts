@@ -6,13 +6,19 @@ import { Scene } from "../../Scene";
 import { SceneObject } from "../../SceneObject";
 import { Shader } from "../../Shader";
 import { Transform } from "../../Transform";
+import { MeshData } from "../../interfaces";
+
+// Loading Obj Models
+import CubeMesh from "../../MeshFiles/Obj/Cube.obj";
+import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
 
 export enum PrimitiveType {
     Cube,
     Quad,
     Sphere,
     Cylinder,
-    Cone
+    Cone,
+    Monkey
 }
 
 export  class Primitive extends SceneObject {
@@ -116,7 +122,7 @@ export  class Primitive extends SceneObject {
             const mesh = new Mesh(
                 scene3D, 
                 shader.ShaderProgram,
-                require('../../MeshFiles/QuadMesh.json')
+                require('../../MeshFiles/Json/QuadMesh.json')
             );
             primitive = new Primitive(
                 scene3D,
@@ -126,10 +132,24 @@ export  class Primitive extends SceneObject {
             );
         }
         else if (primitiveType == PrimitiveType.Cube) {
+            const myVertices = CubeMesh.sorted.vertices as Array<Array<string>>;
+            const myNormals = CubeMesh.sorted.normals as Array<Array<string>>;
+            const myIndices = CubeMesh.sorted.indices  as Array<string>;
+
+            const vertices = myVertices.map(vertex => vertex.map(e => Number(e)));
+            const normals = myNormals.map(normal => normal.map(e => Number(e)));
+            const indices = myIndices.map(index => Number(index));
+
+            const meshData: MeshData = {
+                vertices,
+                normals,
+                indices
+            };
+
             const mesh = new Mesh(
                 scene3D, 
                 shader.ShaderProgram,
-                require('../../MeshFiles/CubeMesh.json')
+                meshData
             );
             primitive = new Primitive(
                 scene3D,
@@ -142,7 +162,7 @@ export  class Primitive extends SceneObject {
             const mesh = new Mesh(
                 scene3D, 
                 shader.ShaderProgram,
-                require('../../MeshFiles/UVSphereMesh.json')
+                require('../../MeshFiles/Json/UVSphereMesh.json')
             );
             primitive = new Primitive(
                 scene3D,
@@ -155,7 +175,7 @@ export  class Primitive extends SceneObject {
             const mesh = new Mesh(
                 scene3D, 
                 shader.ShaderProgram,
-                require('../../MeshFiles/ConeMesh.json')
+                require('../../MeshFiles/Json/ConeMesh.json')
             );
             primitive = new Primitive(
                 scene3D,
@@ -168,7 +188,34 @@ export  class Primitive extends SceneObject {
             const mesh = new Mesh(
                 scene3D, 
                 shader.ShaderProgram,
-                require('../../MeshFiles/CylinderMesh.json')
+                require('../../MeshFiles/Json/CylinderMesh.json')
+            );
+            primitive = new Primitive(
+                scene3D,
+                mesh,
+                shader,
+                primitiveType
+            );
+        }
+        else if (primitiveType == PrimitiveType.Monkey) {
+            const myVertices = MonkeyMesh.sorted.vertices as Array<Array<string>>;
+            const myNormals = MonkeyMesh.sorted.normals as Array<Array<string>>;
+            const myIndices = MonkeyMesh.sorted.indices  as Array<string>;
+
+            const vertices = myVertices.map(vertex => vertex.map(e => Number(e)));
+            const normals = myNormals.map(normal => normal.map(e => Number(e)));
+            const indices = myIndices.map(index => Number(index));
+
+            const meshData: MeshData = {
+                vertices,
+                normals,
+                indices
+            };
+
+            const mesh = new Mesh(
+                scene3D, 
+                shader.ShaderProgram,
+                meshData
             );
             primitive = new Primitive(
                 scene3D,

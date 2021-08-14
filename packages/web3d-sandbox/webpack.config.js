@@ -38,6 +38,12 @@ module.exports = {
                 test: /\.glsl/,
                 exclude: [/node_modules/],
                 use: 'webpack-glsl-loader'
+            },
+            {
+                test: /\.obj/,
+                use: {
+                    loader: path.resolve(__dirname, '../../loaders/webpack-obj-loader.js')
+                }
             }
         ]
     },

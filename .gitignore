@@ -12,3 +12,4 @@ debug.log
 *.log
 .yarn
 .yarnrc
+settings.json
