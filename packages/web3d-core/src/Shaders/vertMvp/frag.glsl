@@ -10,7 +10,6 @@ in vec3 fragPos;
 in vec2 texCord;
 
 uniform float u_time;
-uniform sampler2D u_Texture_0;
 
 out vec4 finalColor;
 
@@ -22,6 +21,13 @@ struct Material {
     float shininess;
 };
 uniform Material u_material;
+
+struct Texture {
+    sampler2D tsampler;
+    int tsampler_check;
+};
+
+uniform Texture u_texture;
 
 struct DirectionalLight {
     vec3 color;
@@ -77,7 +83,6 @@ vec3 getPointLightCast(PointLight pointLight) {
     float intensity = 1.2;
 
     float atten = 1.0 / (pointLight.attenuationCoeff.x + (pointLight.attenuationCoeff.y * lightDistance) + (pointLight.attenuationCoeff.z * pow(lightDistance, 2.)));
-    // atten *= intensity;
 
     vec3 ambience = getAmbience(u_material) * pointLight.color * atten;
     vec3 diffuse = getDiffuse(u_material, vNormal, lightDir) * pointLight.color * atten;
@@ -93,7 +98,9 @@ void main() {
         pointLightCast += getPointLightCast(u_pLights.lights[i]);
     }
     
-    // finalColor = vec4(pointLightCast, 1.0);
-    finalColor = texture(u_Texture_0, texCord) * vec4(pointLightCast, 1.0);
-    // finalColor = texture(u_Texture_0, texCord) * vec4(pointLightCast, 1.0);
+    if (u_texture.tsampler_check > 0) {
+         finalColor = texture(u_texture.tsampler, texCord) * vec4(pointLightCast, 1.0);    
+    } else {
+        finalColor = vec4(pointLightCast, 1.0);    
+    }
 }

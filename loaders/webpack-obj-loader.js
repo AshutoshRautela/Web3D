@@ -79,17 +79,36 @@ module.exports = function(source) {
     
     let output = `
         export default {
-            rvertices: ${JSON.stringify(rvertices)},
-            rtextCords: ${JSON.stringify(rTextCords)},
-            rnormals: ${JSON.stringify(rnormals)},
-            rfaces: ${JSON.stringify(rfaces)},
-            sorted: {
+            meshdata: {
                 vertices: ${JSON.stringify(vertices)},
                 normals: ${JSON.stringify(normals)},
-                textCords: ${JSON.stringify(textCords)},
-                indices: ${JSON.stringify(indices)}
+                texCords: ${JSON.stringify(textCords)},
+                indices: ${JSON.stringify(indices)},
+            },
+            raw: {
+                rvertices: ${JSON.stringify(rvertices)},
+                rtextCords: ${JSON.stringify(rTextCords)},
+                rnormals: ${JSON.stringify(rnormals)},
+                rfaces: ${JSON.stringify(rfaces)}
             }
         };`
     
+    // If texCords are not available exclude it from the return
+    if (rTextCords.length == 0) {
+        output = `
+        export default {
+            meshdata: {
+                vertices: ${JSON.stringify(vertices)},
+                normals: ${JSON.stringify(normals)},
+                indices: ${JSON.stringify(indices)},
+            },
+            raw: {
+                rvertices: ${JSON.stringify(rvertices)},
+                rnormals: ${JSON.stringify(rnormals)},
+                rfaces: ${JSON.stringify(rfaces)}
+            }
+        };`
+    }
+
    return output;
 }

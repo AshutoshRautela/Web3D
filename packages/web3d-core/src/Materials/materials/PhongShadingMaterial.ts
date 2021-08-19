@@ -1,4 +1,4 @@
-import { vec3, vec4 } from "gl-matrix";
+import { vec4 } from "gl-matrix";
 import { EngineLifecycle } from "../../EngineLifeCycle";
 import { Shader } from "../../Shader";
 import { Texture2D } from "../../Texture2D/Texture2D";
@@ -20,11 +20,13 @@ export class PhoneShadingMaterial implements EngineLifecycle{
     private uniformShininess: WebGLUniformLocation | null;
 
     private uniformSamplers: WebGLUniformLocation[];
+    private uniformSamplerTriggers: WebGLUniformLocation[];
     private textures: Texture2D[];
 
     constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[]) { 
         this.textures = textures || [];
         this.uniformSamplers = [];
+        this.uniformSamplerTriggers = [];
 
         if (this.textures) {
             this.textures.forEach((texture) => texture.onInit());
@@ -59,10 +61,12 @@ export class PhoneShadingMaterial implements EngineLifecycle{
     }
 
     private updateTexCordsUniforms() {
-        if (this.textures) {
+        if (this.textures.length > 0) {
             this.textures.forEach((texture, index) => {
-                const uLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_Texture_${index}`);
+                const uLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_texture.tsampler`);
                 this.uniformSamplers.push(uLocation);
+                const uTriggerLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_texture.tsampler_check`);
+                this.uniformSamplerTriggers.push(uTriggerLocation);
             });
         }
     }
@@ -152,19 +156,23 @@ export class PhoneShadingMaterial implements EngineLifecycle{
     /**
      * Applying Material
      */
-    public onUpdate(): void {
-        if (this.textures) {
+    public bind(): void {
+        if (this.textures.length > 0) {
             this.textures.forEach((texture, index) => {
                 texture.bind(index);
                 this.gl2.uniform1i(this.uniformSamplers[index], index);
+                this.gl2.uniform1i(this.uniformSamplerTriggers[index], 1);
             });
         }
         this.gl2.uniform4fv(this.uniformColor, this.color);
-        this.gl2.uniform1f(this.uniformAmbience, this.ambience)
+        this.gl2.uniform1f(this.uniformAmbience, this.ambience);
         this.gl2.uniform1f(this.uniformDiffuse, this.diffuse);
         this.gl2.uniform1f(this.uniformSpecular, this.specular);
         this.gl2.uniform1f(this.uniformShininess, this.shininess);
-        this.textures && this.textures.forEach((texture) => texture.unbind());
+    }
+
+    public unbind() {
+        this.textures.length > 0 && this.textures.forEach((texture) => texture.unbind());
     }
 
     onDestroy() {

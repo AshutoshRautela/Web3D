@@ -8,9 +8,17 @@ import {
         Input,
         KeyCode, 
         Primitive,
+        Model,
         PrimitiveType,
-        MouseButton
+        MouseButton,
+        Mesh,
+        Texture2D
      } from 'web3d-core';
+import { MeshRenderer } from '../../web3d-core/src/MeshRenderer';
+
+// Loading Models
+import CubeMesh from './Mesh/Cube_v2.obj';
+import GroundMesh from './Mesh/Plane.obj';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -22,15 +30,15 @@ let pointLight1: Light;
 let pointLight2: Light;
 
 // Elements in Scene
-let cube: Primitive;
-
-let base: Primitive;
+let cube: Model;
+let ground: Model;
 
 let uvSphere: Primitive;
 let cone: Primitive;
 let cylinder: Primitive;
 
 let monkey: Primitive;
+
 
 const arEngineSize = {
     width: 843,
@@ -43,8 +51,7 @@ const updateEngine = () => {
 
     (pointLight1 as PointLight).setPosition(vec3.fromValues(1, 3, Math.cos(time) * 10 + 8));
     (pointLight2 as PointLight).setPosition(vec3.fromValues(Math.cos(time) * 10, 3, 8));
-
-    base.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
+    
     monkey.Transform.setPosition(vec3.fromValues(0, 3, Math.sin(time) * 5 + 4));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
@@ -96,19 +103,16 @@ const addLights = () => {
 
 const addModels = () => {
     addLights();
-
-    cube = Primitive.createPrimitive(scene3D, PrimitiveType.Cube);
     
+    cube = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(CubeMesh.meshdata)));
     cube.Transform.setPosition(vec3.fromValues(4.5, 1, 4))
-    .setEulerAngles(vec3.fromValues(0, 0, 0));
-    
-    base = Primitive.createPrimitive(scene3D, PrimitiveType.Quad);
-    base.Transform.setEulerAngles(vec3.fromValues(30, 0, 0))
-    .setPosition(vec3.fromValues(0, 0, 10))
-    .setScale(vec3.fromValues(20, 15, 1));
-    base.Material.setColor(vec4.fromValues( 1 , 1 , 1, 1.0 ));
+    cube.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/BrickWall2.jpeg'));
+    cube.Transform.setEulerAngles(vec3.fromValues(0, 45, 0));
 
-    scene3D.Add(base);
+    ground = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(GroundMesh.meshdata)));
+    ground.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/FloorTexture.jpeg'));
+    ground.Transform.setScale(vec3.fromValues(50 , 50 , 50));
+    scene3D.Add(ground);
     
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
     uvSphere.Transform.setPosition(vec3.fromValues(-5, 1 , 4));
@@ -151,9 +155,6 @@ if (canvasRef) {
     arEngineSize.height = canvasRef.height;
 
     Input.activateInputSystem();
-
-    // const cylinderMesh = CylinderCreator.createGeometry();
-    // console.log(JSON.stringify(cylinderMesh, null, 2));
 
     scene3D = new Scene(canvasRef, arEngineSize);
     camera = new Camera(scene3D);
