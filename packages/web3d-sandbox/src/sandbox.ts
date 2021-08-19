@@ -19,6 +19,7 @@ import { MeshRenderer } from '../../web3d-core/src/MeshRenderer';
 // Loading Models
 import CubeMesh from './Mesh/Cube_v2.obj';
 import GroundMesh from './Mesh/Plane.obj';
+import CottageMesh from './Mesh/Cottage.obj';
 
 let canvasRef: HTMLCanvasElement | null;
 let scene3D: Scene;
@@ -32,6 +33,7 @@ let pointLight2: Light;
 // Elements in Scene
 let cube: Model;
 let ground: Model;
+let cottage: Model;
 
 let uvSphere: Primitive;
 let cone: Primitive;
@@ -53,6 +55,7 @@ const updateEngine = () => {
     (pointLight2 as PointLight).setPosition(vec3.fromValues(Math.cos(time) * 10, 3, 8));
     
     monkey.Transform.setPosition(vec3.fromValues(0, 3, Math.sin(time) * 5 + 4));
+    cottage.Transform.setEulerAngles(vec3.fromValues(0, Math.sin(time / 10) * 360, 0));
 
     if (Input.IsKeyPressed(KeyCode.A)) {
         camera.Transform.Translate(vec3.fromValues(-cameraSpeed * 10, 0 , 0));
@@ -119,6 +122,10 @@ const addModels = () => {
         // .setShininessStrength(70);
     ground.Transform.setScale(vec3.fromValues(50 , 50 , 50));
     scene3D.Add(ground);
+
+    cottage = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(CottageMesh.meshdata)));
+    cottage.Material.setTexture(new Texture2D(scene3D.WebGLContext, './Mesh/cottage_diffuse.png'));
+    scene3D.Add(cottage);
     
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
     uvSphere.Transform.setPosition(vec3.fromValues(-5, 1 , 4));
@@ -138,7 +145,7 @@ const addModels = () => {
     monkey.Transform.setEulerAngles(vec3.fromValues(0 , 180, 0));
     scene3D.Add(monkey);
 
-    camera.Transform.setPosition(vec3.fromValues(0, 3, -4));
+    camera.Transform.setPosition(vec3.fromValues(0, 3, -40));
 }
 
 canvasRef = document.createElement('canvas');

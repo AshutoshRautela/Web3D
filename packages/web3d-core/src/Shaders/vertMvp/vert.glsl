@@ -16,6 +16,7 @@ out vec2 texCord;
 void main() {
     vNormal = normalize(mat3(inverse(transpose(u_model))) * a_normal);
     texCord = a_texCord * u_tiling;
+    texCord.y = 1.0 - texCord.y;
 
     fragPos = vec3(u_model * vec4(a_position, 1.0));
 
