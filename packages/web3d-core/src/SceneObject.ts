@@ -11,7 +11,6 @@ export abstract class SceneObject implements EngineLifecycle {
     public onRender?(deltaTime?: number): void;
 
     protected transform: Transform;
-    protected material: PhoneShadingMaterial;
     protected gl2: WebGL2RenderingContext;
 
     constructor(protected scene3D: Scene) {
@@ -22,10 +21,6 @@ export abstract class SceneObject implements EngineLifecycle {
 
     public get Transform() {
         return this.transform;
-    }
-
-    public get Material(): PhoneShadingMaterial {
-        return this.material;
     }
 }
 

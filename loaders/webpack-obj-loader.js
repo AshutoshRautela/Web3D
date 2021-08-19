@@ -74,6 +74,8 @@ module.exports = function(source) {
             }
         });
     });
+
+    indiceMap.clear();
     
     let output = `
         export default {

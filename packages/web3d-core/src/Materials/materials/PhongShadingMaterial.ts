@@ -1,7 +1,11 @@
 import { vec3, vec4 } from "gl-matrix";
+import { EngineLifecycle } from "../../EngineLifeCycle";
+import { Shader } from "../../Shader";
+import { Texture2D } from "../../Texture2D/Texture2D";
 
-export class PhoneShadingMaterial {
+export class PhoneShadingMaterial implements EngineLifecycle{
 
+    private shader: Shader;
     private color: vec4 = vec4.create();
 
     private ambience: number = 0.3;
@@ -15,38 +19,52 @@ export class PhoneShadingMaterial {
     private uniformSpecular: WebGLUniformLocation | null;
     private uniformShininess: WebGLUniformLocation | null;
 
-    private uniformMap: Map<string, WebGLUniformLocation>;
+    private uniformSamplers: WebGLUniformLocation[];
+    private textures: Texture2D[];
 
-    constructor(private gl2: WebGL2RenderingContext, private shaderProgram: WebGLProgram) { 
+    constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[]) { 
+        this.textures = textures || [];
+        this.uniformSamplers = [];
+
+        if (this.textures) {
+            this.textures.forEach((texture) => texture.onInit());
+
+        }
+        this.shader = new Shader(this.gl2, require('../../Shaders/vertMvp/vert.glsl'), require('../../Shaders/vertMvp/frag.glsl'));
         this.setColor(vec4.fromValues(1 , 1 ,1 , 1));
         this.initUniforms();
     }
+
+    public setTexture(texture: Texture2D) {
+        this.textures.push(texture);
+        texture.onInit();
+        this.updateTexCordsUniforms();
+    }
+
 
     /**
      * Initialize Uniforms Locations for Material
      */
     private initUniforms(): void {
-        this.uniformMap = new Map<string, WebGLUniformLocation>();
-
-        this.uniformMap.set('u_material.color', this.uniformColor);
-        this.uniformMap.set('u_material.ambience', this.uniformAmbience);
-        this.uniformMap.set('u_material.diffuse', this.uniformDiffuse);
-        this.uniformMap.set('u_material.specular', this.uniformSpecular);
-        this.uniformMap.set('u_material.shininess', this.uniformShininess);
-
-        this.uniformMap.forEach((value, key) => {
-            value = this.gl2.getUniformLocation(this.shaderProgram, key);
-        });
-
-        this.uniformColor = this.gl2.getUniformLocation(this.shaderProgram, 'u_material.color');
-        this.uniformAmbience = this.gl2.getUniformLocation(this.shaderProgram,
+        this.uniformColor = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_material.color');
+        this.uniformAmbience = this.gl2.getUniformLocation(this.shader.ShaderProgram,
         'u_material.ambience');
-        this.uniformDiffuse = this.gl2.getUniformLocation(this.shaderProgram,
+        this.uniformDiffuse = this.gl2.getUniformLocation(this.shader.ShaderProgram,
         'u_material.diffuse');
-        this.uniformSpecular = this.gl2.getUniformLocation(this.shaderProgram,
+        this.uniformSpecular = this.gl2.getUniformLocation(this.shader.ShaderProgram,
         'u_material.specular');
-        this.uniformShininess = this.gl2.getUniformLocation(this.shaderProgram,
+        this.uniformShininess = this.gl2.getUniformLocation(this.shader.ShaderProgram,
         'u_material.shininess');
+        this.updateTexCordsUniforms();
+    }
+
+    private updateTexCordsUniforms() {
+        if (this.textures) {
+            this.textures.forEach((texture, index) => {
+                const uLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_Texture_${index}`);
+                this.uniformSamplers.push(uLocation);
+            });
+        }
     }
 
     /**
@@ -125,13 +143,31 @@ export class PhoneShadingMaterial {
     }
 
     /**
+     * ShaderProgram
+     */
+    public get ShaderProgram(): WebGLProgram {
+        return this.shader.ShaderProgram;
+    }
+
+    /**
      * Applying Material
      */
     public onUpdate(): void {
+        if (this.textures) {
+            this.textures.forEach((texture, index) => {
+                texture.bind(index);
+                this.gl2.uniform1i(this.uniformSamplers[index], index);
+            });
+        }
         this.gl2.uniform4fv(this.uniformColor, this.color);
         this.gl2.uniform1f(this.uniformAmbience, this.ambience)
         this.gl2.uniform1f(this.uniformDiffuse, this.diffuse);
         this.gl2.uniform1f(this.uniformSpecular, this.specular);
         this.gl2.uniform1f(this.uniformShininess, this.shininess);
+        this.textures && this.textures.forEach((texture) => texture.unbind());
+    }
+
+    onDestroy() {
+        this.shader.onDestroy();
     }
 }

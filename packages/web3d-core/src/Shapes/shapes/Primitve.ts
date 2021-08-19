@@ -4,13 +4,14 @@ import { PhoneShadingMaterial } from "../../Materials";
 import { Mesh } from "../../Mesh";
 import { Scene } from "../../Scene";
 import { SceneObject } from "../../SceneObject";
-import { Shader } from "../../Shader";
 import { Transform } from "../../Transform";
 import { MeshData } from "../../interfaces";
 
 // Loading Obj Models
-import CubeMesh from "../../MeshFiles/Obj/Cube.obj";
+import CubeMesh2 from "../../MeshFiles/Obj/Cube_v2.obj";
 import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
+import { MeshRenderer } from "../../MeshRenderer";
+import { Texture2D } from "../../Texture2D/Texture2D";
 
 export enum PrimitiveType {
     Cube,
@@ -22,6 +23,8 @@ export enum PrimitiveType {
 }
 
 export  class Primitive extends SceneObject {
+
+    private material: PhoneShadingMaterial;
 
     private timeUniformLocation!: WebGLUniformLocation | null;
     private mvpUniformLocation!: WebGLUniformLocation | null;
@@ -38,48 +41,53 @@ export  class Primitive extends SceneObject {
     private uniformPLightsIntensity: WebGLUniformLocation[] = [];
     private uniformPLightsAttenC: WebGLUniformLocation[] = [];
 
-    constructor(scene3D: Scene, private mesh: Mesh, private shader: Shader, private primitiveType: PrimitiveType) {
+    constructor(scene3D: Scene,
+         private meshRenderer: MeshRenderer,
+         private primitiveType: PrimitiveType
+    ) {
         super(scene3D);
-
-        this.transform = new Transform();
-        if (!this.shader.ShaderProgram) {
-            throw new Error('Error Compiling Shader');
+        if (primitiveType === PrimitiveType.Cube) {
+            this.material = new PhoneShadingMaterial(this.gl2);
+            this.material.setTexture(new Texture2D(this.gl2, '/textures/BrickWall2.jpeg'));
+        } else {
+            this.material = new PhoneShadingMaterial(this.gl2);
         }
-        this.mesh.onInit();
+        this.transform = new Transform();
+        this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
+        this.meshRenderer.onInit();
         this.initUniforms();
-        this.material = new PhoneShadingMaterial(this.gl2, this.shader.ShaderProgram);
     }
 
     private initUniforms() {
-        this.timeUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_time');
-        this.mvpUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_mvp');
-        this.modelUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_model');
+        this.timeUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_time');
+        this.mvpUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_mvp');
+        this.modelUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_model');
         
-        this.uniformDLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLights.numLights');
+        this.uniformDLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_dLights.numLights');
         this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
-            this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].color`));
-            this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].direction`));
-            this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].intensity`));
+            this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].color`));
+            this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].direction`));
+            this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].intensity`));
         });
 
-        this.uniformPLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_pLights.numLights');
+        this.uniformPLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_pLights.numLights');
         this.scene3D.PointLights.forEach((pLight: PointLight, index: number) => {
-            this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].color`));
-            this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].position`));
-            this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].intensity`));
-            this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
+            this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].color`));
+            this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].position`));
+            this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].intensity`));
+            this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
         });       
     }
 
     onRender(deltaTime: number) {
-        if (this.shader.ShaderProgram) {
+        if (this.material.ShaderProgram) {
             this.transform.onRender();
 
             let mvMatrix: mat4 =  mat4.create();
             mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix);
             mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
 
-            this.gl2.useProgram(this.shader.ShaderProgram);
+            this.gl2.useProgram(this.material.ShaderProgram);
 
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500);
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
@@ -103,97 +111,75 @@ export  class Primitive extends SceneObject {
                 });
             }
             this.material.onUpdate();
-            this.mesh.draw();
+            this.meshRenderer.draw();
         }
     }
 
     onDestroy() {
-        this.mesh.onDestroy();
-        this.shader.onDestroy();
+        this.meshRenderer.onDestroy();
+        this.material.onDestroy();
+    }
+
+    public get Material(): PhoneShadingMaterial {
+        return this.material;
     }
 
     static createPrimitive(scene3D: Scene, primitiveType: PrimitiveType): Primitive {
         let primitive: Primitive;
-        const shader = new Shader(scene3D.WebGLContext,
-            require('../../shaders/vertMvp/vert.glsl'),
-            require('../../shaders/vertMvp/frag.glsl')
-        );
         if (primitiveType == PrimitiveType.Quad) {
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                require('../../MeshFiles/Json/QuadMesh.json')
-            );
+            const mesh = new Mesh(require('../../MeshFiles/Json/QuadMesh.json'));
+            const material = new PhoneShadingMaterial(scene3D.WebGLContext);
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cube) {
-            const myVertices = CubeMesh.sorted.vertices as Array<Array<string>>;
-            const myNormals = CubeMesh.sorted.normals as Array<Array<string>>;
-            const myIndices = CubeMesh.sorted.indices  as Array<string>;
+            const myVertices = CubeMesh2.sorted.vertices as Array<Array<string>>;
+            const myNormals = CubeMesh2.sorted.normals as Array<Array<string>>;
+            const myTexcords = CubeMesh2.sorted.textCords as Array<Array<string>>;
+            const myIndices = CubeMesh2.sorted.indices  as Array<string>;
 
             const vertices = myVertices.map(vertex => vertex.map(e => Number(e)));
             const normals = myNormals.map(normal => normal.map(e => Number(e)));
+            const texCords = myTexcords.map(texCord => texCord.map(e => Number(e)));
             const indices = myIndices.map(index => Number(index));
 
             const meshData: MeshData = {
                 vertices,
                 normals,
-                indices
+                indices,
+                texCords
             };
-
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                meshData
-            );
+            const mesh = new Mesh(meshData);
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Sphere) {
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                require('../../MeshFiles/Json/UVSphereMesh.json')
-            );
+            const mesh = new Mesh(require('../../MeshFiles/Json/UVSphereMesh.json'));
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cone) {
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                require('../../MeshFiles/Json/ConeMesh.json')
-            );
+            const mesh = new Mesh(require('../../MeshFiles/Json/ConeMesh.json'));
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }
         else if (primitiveType == PrimitiveType.Cylinder) {
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                require('../../MeshFiles/Json/CylinderMesh.json')
-            );
+            const mesh = new Mesh(require('../../MeshFiles/Json/CylinderMesh.json'));
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }
@@ -211,16 +197,10 @@ export  class Primitive extends SceneObject {
                 normals,
                 indices
             };
-
-            const mesh = new Mesh(
-                scene3D, 
-                shader.ShaderProgram,
-                meshData
-            );
+            const mesh = new Mesh(meshData);
             primitive = new Primitive(
                 scene3D,
-                mesh,
-                shader,
+                new MeshRenderer(scene3D.WebGLContext, mesh),
                 primitiveType
             );
         }

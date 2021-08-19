@@ -7,8 +7,10 @@ precision mediump float;
 
 in vec3 vNormal;
 in vec3 fragPos;
+in vec2 texCord;
 
 uniform float u_time;
+uniform sampler2D u_Texture_0;
 
 out vec4 finalColor;
 
@@ -44,8 +46,6 @@ struct PointLights {
     int numLights;
 };
 uniform PointLights u_pLights;
-
-
 float lightRange = 50.;
 
 vec3 getAmbience(Material material) {
@@ -93,5 +93,7 @@ void main() {
         pointLightCast += getPointLightCast(u_pLights.lights[i]);
     }
     
-    finalColor = vec4(pointLightCast, 1.0);
+    // finalColor = vec4(pointLightCast, 1.0);
+    finalColor = texture(u_Texture_0, texCord) * vec4(pointLightCast, 1.0);
+    // finalColor = texture(u_Texture_0, texCord) * vec4(pointLightCast, 1.0);
 }

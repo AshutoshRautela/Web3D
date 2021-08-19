@@ -85,12 +85,12 @@ const addLights = () => {
 
     pointLight1 = new PointLight();
     (pointLight1 as PointLight).setPosition(vec3.fromValues(0, 4, 4));
-    (pointLight1 as PointLight).setColor(vec3.fromValues(0 , 1 , 1));
+    // (pointLight1 as PointLight).setColor(vec3.fromValues(0 , 1 , 1));
     scene3D.AddLight(pointLight1);
 
     pointLight2 = new PointLight();
     (pointLight2 as PointLight).setPosition(vec3.fromValues(4 , 10 , 18));
-    (pointLight2 as PointLight).setColor(vec3.fromValues(1 , 0 , 1));
+    // (pointLight2 as PointLight).setColor(vec3.fromValues(1 , 0 , 1));
     scene3D.AddLight(pointLight2);
 }
 
