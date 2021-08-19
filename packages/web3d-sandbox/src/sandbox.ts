@@ -1,4 +1,4 @@
-import { vec3, vec4 } from 'gl-matrix';
+import { vec2, vec3, vec4 } from 'gl-matrix';
 import {
         Camera,
         DirectionalLight,
@@ -88,7 +88,8 @@ const updateEngine = () => {
 
 const addLights = () => {
     directionalLight = new DirectionalLight();
-    (directionalLight as DirectionalLight).setDirection(vec3.fromValues(1, 1, -1));
+    (directionalLight as DirectionalLight).setDirection(vec3.fromValues(-1, -1, 0));
+    scene3D.AddLight(directionalLight);
 
     pointLight1 = new PointLight();
     (pointLight1 as PointLight).setPosition(vec3.fromValues(0, 4, 4));
@@ -107,16 +108,20 @@ const addModels = () => {
     cube = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(CubeMesh.meshdata)));
     cube.Transform.setPosition(vec3.fromValues(4.5, 1, 4))
     cube.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/BrickWall2.jpeg'));
+    cube.Material.setTiling(vec2.fromValues(4 , 4));
     cube.Transform.setEulerAngles(vec3.fromValues(0, 45, 0));
 
     ground = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(GroundMesh.meshdata)));
-    ground.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/FloorTexture.jpeg'));
+    ground.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/FloorTexture.jpeg'))
+        .setTiling(vec2.fromValues(10, 10))
+        // .setDiffuseStrength(2)
+        // .setSpecularStrength(0.4)
+        // .setShininessStrength(70);
     ground.Transform.setScale(vec3.fromValues(50 , 50 , 50));
     scene3D.Add(ground);
     
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
     uvSphere.Transform.setPosition(vec3.fromValues(-5, 1 , 4));
-    
     scene3D.Add(cube);
     scene3D.Add(uvSphere);
 

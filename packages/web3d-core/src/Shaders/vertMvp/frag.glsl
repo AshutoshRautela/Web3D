@@ -3,7 +3,8 @@ precision mediump float;
 
 #define MAX_LIGHTS 50
 // Need to find solution for this
-#define NUM_LIGHTS 2
+#define NUM_LIGHTS 1
+#define NUM_LIGHTS_DIRECTIONAL 1
 
 in vec3 vNormal;
 in vec3 fragPos;
@@ -69,7 +70,7 @@ vec3 getSpecular(Material material, vec3 normal, vec3 light) {
     vec3 cameraPos = vec3(0 , 3 , -4);
 
     // Reflect the Light over the normal
-    vec3 reflectedLight = reflect(light, normal);
+    vec3 reflectedLight = reflect(-light, normal);
     vec3 viewDir = normalize(cameraPos - fragPos);
 
     float specCoeff =  pow(max(dot(viewDir, reflectedLight), 0.), material.shininess);
@@ -91,16 +92,34 @@ vec3 getPointLightCast(PointLight pointLight) {
     return ambience + diffuse + specular;
 }
 
+vec3 getDirectionalLightCast(DirectionalLight directionalLight) {
+    vec3 lightDir = -normalize(directionalLight.direction);
+    float intensity = 1.2;
+
+    vec3 ambience = getAmbience(u_material) * directionalLight.color;
+    vec3 diffuse = getDiffuse(u_material, vNormal, lightDir) * directionalLight.color;
+    vec3 specular = getSpecular(u_material, vNormal, lightDir) * directionalLight.color;
+    
+    return ambience + diffuse + specular;
+}
+
 void main() {
     vec3 pointLightCast = vec3(0);
+    vec3 dirLightCast = vec3(0);
+    vec3 lightCast = vec3(0);
 
     for (int i = 0; i < NUM_LIGHTS; i++) {
-        pointLightCast += getPointLightCast(u_pLights.lights[i]);
+    //    pointLightCast += getPointLightCast(u_pLights.lights[i]);
     }
+    for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++) {
+        dirLightCast += getDirectionalLightCast(u_dLights.lights[i]);
+    }
+
+    lightCast = dirLightCast + pointLightCast;
     
     if (u_texture.tsampler_check > 0) {
-         finalColor = texture(u_texture.tsampler, texCord) * vec4(pointLightCast, 1.0);    
+         finalColor = texture(u_texture.tsampler, texCord) * vec4(lightCast, 1.0);    
     } else {
-        finalColor = vec4(pointLightCast, 1.0);    
+        finalColor = vec4(lightCast, 1.0);    
     }
 }

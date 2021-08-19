@@ -1,6 +1,6 @@
 import { mat4 } from "gl-matrix";
 import { DirectionalLight, PointLight } from "../../Lights";
-import { PhoneShadingMaterial } from "../../Materials";
+import { PhongShadingMaterial } from "../../Materials";
 import { Scene } from "../../Scene";
 import { SceneObject } from "../../SceneObject";
 import { Transform } from "../../Transform";
@@ -8,7 +8,7 @@ import { MeshRenderer } from "../../MeshRenderer";
 
 export  class Model extends SceneObject {
 
-    protected material: PhoneShadingMaterial;
+    protected material: PhongShadingMaterial;
 
     private timeUniformLocation!: WebGLUniformLocation | null;
     private mvpUniformLocation!: WebGLUniformLocation | null;
@@ -29,7 +29,7 @@ export  class Model extends SceneObject {
          protected meshRenderer: MeshRenderer,
     ) {
         super(scene3D);
-        this.material = new PhoneShadingMaterial(this.gl2);
+        this.material = new PhongShadingMaterial(this.gl2);
         this.transform = new Transform();
         this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
         this.meshRenderer.onInit();
@@ -99,7 +99,7 @@ export  class Model extends SceneObject {
         this.material.onDestroy();
     }
 
-    public get Material(): PhoneShadingMaterial {
+    public get Material(): PhongShadingMaterial {
         return this.material;
     }
 }

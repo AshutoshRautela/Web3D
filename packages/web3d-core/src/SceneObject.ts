@@ -1,6 +1,5 @@
 
 import { EngineLifecycle } from './EngineLifeCycle';
-import { PhoneShadingMaterial } from './Materials';
 import { Scene } from './Scene';
 import { Transform } from './Transform';
 
