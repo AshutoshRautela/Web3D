@@ -9,7 +9,7 @@ export class Web3D {
   }
 
   static clean(): void {
-      SceneManager.clean();
-      Input.cleanInputSystem();
+    SceneManager.clean();
+    Input.cleanInputSystem();
   }
 }

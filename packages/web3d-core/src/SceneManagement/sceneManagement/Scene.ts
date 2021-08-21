@@ -2,6 +2,7 @@ import { Camera } from '../../Camera';
 import { DirectionalLight, Light, PointLight } from '../../Lights'
 import { SceneObject } from '../../SceneObject';
 import { Subject, Subscription } from 'rxjs';
+import { vec4 } from 'gl-matrix';
 
 export interface ViewportSize {
     width: number;
@@ -34,16 +35,24 @@ export class Scene {
 
     private sceneEventDispatcher: Map<SceneEventType, Subject<SceneDetails>> = new Map<SceneEventType, Subject<SceneDetails>>();
 
+    private clearColor: vec4;
+
     constructor(private name:string, size: ViewportSize, canvas?: HTMLCanvasElement) {
         this.canvas = canvas || document.createElement('canvas') as HTMLCanvasElement;
         this.gl2 = this.canvas.getContext('webgl2') as WebGL2RenderingContext;
         if (!this.gl2) {
             throw "Error getting WebGL Context";
         }
+        this.clearColor = vec4.fromValues(0.05, 0.05, 0.05, 1.0);
+
         this.prepareEventDispatcher();
         this.resizeScene(size, true);
         this.enableDepthTest();
-        window.addEventListener('resize', () => this.resizeScene({width: window.innerWidth, height: window.innerHeight}, true));
+        window.addEventListener('resize', this.onResize);
+    }
+
+    private onResize = () => {
+        this.resizeScene({width: window.innerWidth, height: window.innerHeight}, true)
     }
 
     public addEventListener(event: SceneEventType, callback: () => void): Subscription {
@@ -75,7 +84,7 @@ export class Scene {
     }
 
     public resizeScene(size: ViewportSize, updateCanvas: boolean = false) {
-        this.size = size;
+        this.size = size
         this.gl2.viewport(0 , 0 , this.size.width, this.size.height);
         if (updateCanvas) {
             this.canvas.width = this.size.width;
@@ -85,11 +94,11 @@ export class Scene {
     }
 
     public onDestroy() {
-
+        window.removeEventListener('resize', this.onResize);
     }
 
     private clearCanvas() {
-        this.gl2.clearColor(0.05, 0.05, 0.05, 1.0);
+        this.gl2.clearColor(this.clearColor[0], this.clearColor[1], this.clearColor[2], this.clearColor[3]);
         this.gl2.clear(this.gl2.COLOR_BUFFER_BIT | this.gl2.DEPTH_BUFFER_BIT);
     }
 
@@ -131,6 +140,10 @@ export class Scene {
         this.lastTick = performance.now();
 
         this.renderableObjects.forEach(rObject => rObject.onRender && rObject.onRender(deltaTime));
+    }
+
+    public set ClearColor(clearColor: vec4) {
+        vec4.copy(this.clearColor, clearColor);
     }
 
     public get WebGLContext(): WebGL2RenderingContext {

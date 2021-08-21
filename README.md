@@ -8,10 +8,11 @@ The project is managed into modules.
 
 ![](images/Render6.png) 
 
-
 ![](images/Render5.png)
 
 ![](images/Render7.png)
+
+![](images/Render8.png)
 
 ## How to setup this repo on your machine?
 
