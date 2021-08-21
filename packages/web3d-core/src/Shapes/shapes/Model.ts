@@ -1,10 +1,11 @@
 import { mat4 } from "gl-matrix";
 import { DirectionalLight, PointLight } from "../../Lights";
 import { PhongShadingMaterial } from "../../Materials";
-import { Scene } from "../../Scene";
+import { Scene, SceneEventType } from "../../SceneManagement";
 import { SceneObject } from "../../SceneObject";
 import { Transform } from "../../Transform";
 import { MeshRenderer } from "../../MeshRenderer";
+import { Mesh } from "../../Mesh";
 
 export  class Model extends SceneObject {
 
@@ -34,6 +35,10 @@ export  class Model extends SceneObject {
         this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
         this.meshRenderer.onInit();
         this.initUniforms();
+
+        scene3D.addEventListener(SceneEventType.OnLightAdd, () => {
+            this.initUniforms();
+        });
     }
 
     private initUniforms() {
@@ -55,6 +60,12 @@ export  class Model extends SceneObject {
             this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].intensity`));
             this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
         });       
+    }
+
+    static createRenderableMode(scene3D: Scene, mesh: Mesh): Model {
+        const meshRenderer = new MeshRenderer(scene3D.WebGLContext, mesh);
+        const model = new Model(scene3D, meshRenderer);
+        return model;
     }
 
     onRender(deltaTime: number) {

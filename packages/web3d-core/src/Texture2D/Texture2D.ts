@@ -6,7 +6,7 @@ export class Texture2D implements EngineLifecycle {
     private image: HTMLImageElement;
     private texture: WebGLTexture;
 
-    constructor(private gl2: WebGL2RenderingContext, private path: string) {
+    constructor(private gl2: WebGL2RenderingContext, private path?: string) {
     }
 
     onInit() {
@@ -14,8 +14,11 @@ export class Texture2D implements EngineLifecycle {
         
         // Updating a sample texture
         this.gl2.bindTexture(this.gl2.TEXTURE_2D, this.texture);
-        this.gl2.texImage2D(this.gl2.TEXTURE_2D, 0, this.gl2.RGBA, 1, 1, 0, this.gl2.RGBA, this.gl2.UNSIGNED_BYTE, new Uint8Array([255, 0 , 255 , 255]));
+        this.gl2.texImage2D(this.gl2.TEXTURE_2D, 0, this.gl2.RGBA, 1, 1, 0, this.gl2.RGBA, this.gl2.UNSIGNED_BYTE, new Uint8Array([255, 255 , 255 , 255]));
+        this.path && this.setImage();
+    }
 
+    setImage() {
         this.image = new Image();
         this.image.onload = () => {
             this.gl2.bindTexture(this.gl2.TEXTURE_2D, this.texture);

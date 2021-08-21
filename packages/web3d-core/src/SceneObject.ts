@@ -1,6 +1,6 @@
 
 import { EngineLifecycle } from './EngineLifeCycle';
-import { Scene } from './Scene';
+import { Scene } from './SceneManagement';
 import { Transform } from './Transform';
 
 export abstract class SceneObject implements EngineLifecycle {

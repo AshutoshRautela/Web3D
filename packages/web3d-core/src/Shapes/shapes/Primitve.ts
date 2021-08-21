@@ -1,5 +1,5 @@
 import { Mesh } from "../../Mesh";
-import { Scene } from "../../Scene";
+import { Scene } from "../../SceneManagement";
 import { MeshData } from "../../interfaces";
 // Loading Obj Models
 import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
@@ -24,7 +24,7 @@ export  class Primitive extends Model {
     ) {
         super(scene3D, meshRenderer);
         if (primitiveType === PrimitiveType.Cube) {
-            this.material.setTexture(new Texture2D(this.gl2, '/textures/BrickWall2.jpeg'));
+            this.material.setTexture('/textures/BrickWall2.jpeg');
         }
     }
 

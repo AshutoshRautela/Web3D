@@ -5,6 +5,7 @@ import {
         Light, 
         PointLight, 
         Scene,
+        SceneManager,
         Input,
         KeyCode, 
         Primitive,
@@ -12,7 +13,8 @@ import {
         PrimitiveType,
         MouseButton,
         Mesh,
-        Texture2D
+        Texture2D,
+        Web3D
      } from 'web3d-core';
 import { MeshRenderer } from '../../web3d-core/src/MeshRenderer';
 
@@ -106,17 +108,15 @@ const addLights = () => {
 }
 
 const addModels = () => {
-    addLights();
-    
     cube = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(CubeMesh.meshdata)));
     cube.Transform.setPosition(vec3.fromValues(4.5, 1, 4))
-    cube.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/BrickWall2.jpeg'));
+    cube.Material.setTexture('./textures/BrickWall2.jpeg');
     cube.Material.setTiling(vec2.fromValues(4 , 4));
     cube.Transform.setEulerAngles(vec3.fromValues(0, 45, 0));
 
     ground = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(GroundMesh.meshdata)));
-    ground.Material.setTexture(new Texture2D(scene3D.WebGLContext, './textures/FloorTexture.jpeg'))
-        .setTiling(vec2.fromValues(10, 10))
+    ground.Material.setTexture('./textures/BrickWall2.jpeg')
+    ground.Material.setTiling(vec2.fromValues(10, 10))
         // .setDiffuseStrength(2)
         // .setSpecularStrength(0.4)
         // .setShininessStrength(70);
@@ -124,7 +124,7 @@ const addModels = () => {
     scene3D.Add(ground);
 
     cottage = new Model(scene3D, new MeshRenderer(scene3D.WebGLContext, new Mesh(CottageMesh.meshdata)));
-    cottage.Material.setTexture(new Texture2D(scene3D.WebGLContext, './Mesh/cottage_diffuse.png'));
+    cottage.Material.setTexture('./textures/BrickWall2.jpeg');
     scene3D.Add(cottage);
     
     uvSphere = Primitive.createPrimitive(scene3D, PrimitiveType.Sphere);
@@ -146,6 +146,7 @@ const addModels = () => {
     scene3D.Add(monkey);
 
     camera.Transform.setPosition(vec3.fromValues(0, 3, -40));
+    addLights();
 }
 
 canvasRef = document.createElement('canvas');
@@ -168,7 +169,7 @@ if (canvasRef) {
 
     Input.activateInputSystem();
 
-    scene3D = new Scene(canvasRef, arEngineSize);
+    scene3D = SceneManager.createScene("TestScene", { width: canvasRef.width, height: canvasRef.height });
     camera = new Camera(scene3D);
     scene3D.AddCamera(camera);
 

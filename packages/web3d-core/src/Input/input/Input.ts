@@ -7,12 +7,13 @@ export {
 };
 
 export class Input {
-    public static activateInputSystem() {
+    public static activateInputSystem(): boolean {
         
         KeyboardHandler.activateKeyboardInputSystem();
         MouseHandler.activateMouseInputSystem();
        
         window.oncontextmenu = () => false;
+        return true;
     }
 
     public static cleanInputSystem() {

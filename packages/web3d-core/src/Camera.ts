@@ -1,5 +1,5 @@
 import { mat4, vec3, vec4 } from "gl-matrix";
-import { Scene } from "./Scene";
+import { Scene, SceneEventType } from "./SceneManagement";
 import { SceneObject } from "./SceneObject";
 import { Util } from './Util';
 export class Camera extends SceneObject {
@@ -11,10 +11,7 @@ export class Camera extends SceneObject {
     private cameraRight: vec3;
     private cameraUp: vec3;
 
-    private lootAtPosition: vec3;
-
-
-    constructor(scene3D: Scene) {
+    constructor(scene3D: Scene, position?: vec3, eulerAngles?: vec3) {
         super(scene3D);
         this.viewMatrix = mat4.create();
         this.projectionMatrix = mat4.create();
@@ -22,10 +19,17 @@ export class Camera extends SceneObject {
         this.cameraForward = vec3.create();
         this.cameraRight = vec3.create();
         this.cameraUp = vec3.create();
-        this.lootAtPosition = vec3.create();
 
-        this.transform.setPosition(vec3.fromValues(0 , 0 , -3));
-        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.size.WIDTH / this.scene3D.size.HEIGHT , 0.1, 1000);
+        position && this.transform.setPosition(position);
+        eulerAngles && this.transform.setEulerAngles(eulerAngles);
+
+        this.calulcateProjection();
+
+        scene3D.addEventListener(SceneEventType.OnViewportResize, () => this.calulcateProjection());
+    }
+
+    private calulcateProjection() {
+        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.AspectRatio , 0.1, 1000);
     }
 
     onRender() {

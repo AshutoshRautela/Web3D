@@ -28,7 +28,7 @@ export class PhongShadingMaterial implements EngineLifecycle{
     private tiling: vec2;
 
     constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[]) { 
-        this.textures = textures || [];
+        this.textures = textures || [new Texture2D(this.gl2)];
         this.uniformSamplers = [];
         this.uniformSamplerTriggers = [];
 
@@ -78,11 +78,12 @@ export class PhongShadingMaterial implements EngineLifecycle{
         return this;
     }
 
-    public setTexture(texture: Texture2D): PhongShadingMaterial {
-        this.textures.push(texture);
+    public setTexture(texturePath: string): Texture2D {
+        const texture = new Texture2D(this.gl2, texturePath);
+        this.textures[0] = texture;
         texture.onInit();
         this.updateTexCordsUniforms();
-        return this;
+        return texture;
     }
 
     public setTiling(tiling: vec2): PhongShadingMaterial {
