@@ -4,7 +4,7 @@ import { MeshData } from "../../interfaces";
 // Loading Obj Models
 import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
 import { MeshRenderer } from "../../MeshRenderer";
-import { Texture2D } from "../../Texture2D/Texture2D";
+import { UVSphereCreator } from "../../GeometryCreator";
 import { Model } from "./Model";
 
 export enum PrimitiveType {
@@ -13,7 +13,7 @@ export enum PrimitiveType {
     Sphere,
     Cylinder,
     Cone,
-    Monkey
+    Monkey,
 }
 
 export  class Primitive extends Model {
@@ -55,7 +55,8 @@ export  class Primitive extends Model {
             );
         }
         else if (primitiveType == PrimitiveType.Sphere) {
-            const mesh = new Mesh(require('../../MeshFiles/Json/UVSphereMesh.json'));
+            const meshData = UVSphereCreator.createGeometry();
+            const mesh = new Mesh(meshData);
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),

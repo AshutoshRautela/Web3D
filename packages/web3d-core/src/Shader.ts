@@ -5,6 +5,11 @@ export enum ShaderType {
     FRAGMENT
 }
 
+export enum Shaders {
+    StandardPhong,
+    Unlit
+}
+
 export class Shader implements EngineLifecycle {
 
     private vShader: WebGLShader | null;
@@ -76,6 +81,16 @@ export class Shader implements EngineLifecycle {
 
     public get ShaderProgram(): WebGLProgram | null {
         return this.shaderProgram;
+    }
+
+    public static createShader(gl2: WebGL2RenderingContext, shaderType: Shaders): Shader {
+        let shader: Shader;
+        if (shaderType === Shaders.StandardPhong) {
+            shader = new Shader(gl2, require('./Shaders/vertMvp/vert.glsl'), require('./Shaders/vertMvp/frag.glsl'));
+        } else if (shaderType === Shaders.Unlit) {
+            shader = new Shader(gl2, require('./Shaders/Unlit/vert.glsl'), require('./Shaders/Unlit/frag.glsl'));
+        }
+        return shader;
     }
 
     onDestroy() {

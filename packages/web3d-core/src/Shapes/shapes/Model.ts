@@ -1,20 +1,21 @@
 import { mat4 } from "gl-matrix";
 import { DirectionalLight, PointLight } from "../../Lights";
-import { PhongShadingMaterial } from "../../Materials";
+import { MaterialEventType, PhongShadingMaterial } from "../../Materials";
 import { Scene, SceneEventType } from "../../SceneManagement";
 import { SceneObject } from "../../SceneObject";
 import { Transform } from "../../Transform";
 import { MeshRenderer } from "../../MeshRenderer";
 import { Mesh } from "../../Mesh";
+import { Shaders } from "../../Shader";
 
-export  class Model extends SceneObject {
+export class Model extends SceneObject {
 
     protected material: PhongShadingMaterial;
 
     private timeUniformLocation!: WebGLUniformLocation | null;
     private mvpUniformLocation!: WebGLUniformLocation | null;
     private modelUniformLocation: WebGLUniformLocation | null;
-    
+
     private uniformDLightsCount: WebGLUniformLocation;
     private uniformDLightsColor: WebGLUniformLocation[] = [];
     private uniformDLightsDirection: WebGLUniformLocation[] = [];
@@ -27,10 +28,11 @@ export  class Model extends SceneObject {
     private uniformPLightsAttenC: WebGLUniformLocation[] = [];
 
     constructor(scene3D: Scene,
-         protected meshRenderer: MeshRenderer,
+        protected meshRenderer: MeshRenderer,
+        material?: PhongShadingMaterial
     ) {
         super(scene3D);
-        this.material = new PhongShadingMaterial(this.gl2);
+        this.material = material || new PhongShadingMaterial(this.gl2);
         this.transform = new Transform();
         this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
         this.meshRenderer.onInit();
@@ -39,40 +41,46 @@ export  class Model extends SceneObject {
         scene3D.addEventListener(SceneEventType.OnLightAdd, () => {
             this.initUniforms();
         });
+        this.material.addEventListener(MaterialEventType.ShaderUpdate, () => {
+            this.initUniforms();
+            this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
+        });
     }
 
     private initUniforms() {
-        this.timeUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_time');
-        this.mvpUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_mvp');
-        this.modelUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_model');
-        
-        this.uniformDLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_dLights.numLights');
-        this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
-            this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].color`));
-            this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].direction`));
-            this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].intensity`));
-        });
+        if (this.material?.ShaderProgram) {
+            this.timeUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_time');
+            this.mvpUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_mvp');
+            this.modelUniformLocation = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_model');
 
-        this.uniformPLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_pLights.numLights');
-        this.scene3D.PointLights.forEach((pLight: PointLight, index: number) => {
-            this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].color`));
-            this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].position`));
-            this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].intensity`));
-            this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
-        });       
+            this.uniformDLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_dLights.numLights');
+            this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
+                this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].color`));
+                this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].direction`));
+                this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_dLights.lights[${index}].intensity`));
+            });
+
+            this.uniformPLightsCount = this.gl2.getUniformLocation(this.material.ShaderProgram, 'u_pLights.numLights');
+            this.scene3D.PointLights.forEach((pLight: PointLight, index: number) => {
+                this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].color`));
+                this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].position`));
+                this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].intensity`));
+                this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.material.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
+            });
+        }
     }
 
-    static createRenderableMode(scene3D: Scene, mesh: Mesh): Model {
+    static createRenderableMode(scene3D: Scene, mesh: Mesh, shaderType?: Shaders): Model {
         const meshRenderer = new MeshRenderer(scene3D.WebGLContext, mesh);
-        const model = new Model(scene3D, meshRenderer);
+        const model = new Model(scene3D, meshRenderer, new PhongShadingMaterial(scene3D.WebGLContext, [], shaderType));
         return model;
     }
 
     onRender(deltaTime: number) {
-        if (this.material.ShaderProgram) {
+        if (this.material?.ShaderProgram) {
             this.transform.onRender();
 
-            let mvMatrix: mat4 =  mat4.create();
+            let mvMatrix: mat4 = mat4.create();
             mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix);
             mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.transform.ModelMatrix);
 
@@ -81,9 +89,9 @@ export  class Model extends SceneObject {
             this.gl2.uniform1f(this.timeUniformLocation, performance.now() / 500);
             this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
             this.gl2.uniformMatrix4fv(this.modelUniformLocation, false, this.transform.ModelMatrix);
-            
+
             if (this.scene3D.PointLights.length > 0) {
-                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length );
+                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length);
                 this.scene3D.PointLights.forEach((pointLight: PointLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformPLightsColor[index], pointLight.Color);
                     this.gl2.uniform3fv(this.uniformPLightsPosition[index], pointLight.Position);
@@ -92,7 +100,7 @@ export  class Model extends SceneObject {
                 });
             };
             if (this.scene3D.DirectionalLights.length > 0) {
-                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length );
+                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length);
                 this.scene3D.DirectionalLights.forEach((directionLight: DirectionalLight, index: number) => {
                     this.gl2.uniform3fv(this.uniformDLightsColor[index], directionLight.Color);
                     this.gl2.uniform3fv(this.uniformDLightsDirection[index], directionLight.Direction);

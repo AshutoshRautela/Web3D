@@ -1,9 +1,15 @@
 import { vec2, vec4 } from "gl-matrix";
+import { Subject } from "rxjs";
 import { EngineLifecycle } from "../../EngineLifeCycle";
-import { Shader } from "../../Shader";
+import { Scene } from "../../SceneManagement";
+import { Shader, Shaders } from "../../Shader";
 import { Texture2D } from "../../Texture2D/Texture2D";
 
-export class PhongShadingMaterial implements EngineLifecycle{
+export enum MaterialEventType {
+    ShaderUpdate = "ShaderUpdate"
+}
+
+export class PhongShadingMaterial implements EngineLifecycle {
 
     private shader: Shader;
     private color: vec4 = vec4.create();
@@ -27,7 +33,10 @@ export class PhongShadingMaterial implements EngineLifecycle{
     private tilingUniformLocation: WebGLUniformLocation;
     private tiling: vec2;
 
-    constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[]) { 
+    private materialEventDispatcher: Map<MaterialEventType, Subject<{}>>;
+
+    constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[], shaderType?: Shaders) {
+        this.setupMaterialEventDispatcher();
         this.textures = textures || [new Texture2D(this.gl2)];
         this.uniformSamplers = [];
         this.uniformSamplerTriggers = [];
@@ -35,37 +44,46 @@ export class PhongShadingMaterial implements EngineLifecycle{
         if (this.textures) {
             this.textures.forEach((texture) => texture.onInit());
         }
-        this.shader = new Shader(this.gl2, require('../../Shaders/vertMvp/vert.glsl'), require('../../Shaders/vertMvp/frag.glsl'));
-        this.setColor(vec4.fromValues(1 , 1 ,1 , 1));
-        this.initUniforms();
-        this.tiling = vec2.fromValues(1 , 1);
+        this.shader = shaderType ? Shader.createShader(gl2, shaderType) : Shader.createShader(gl2, Shaders.StandardPhong);
+        this.setColor(vec4.fromValues(1, 1, 1, 1));
+        this.tiling = vec2.fromValues(1, 1);
+        this.updateUniforms(this.shader.ShaderProgram);
+    }
+
+    private setupMaterialEventDispatcher() {
+        this.materialEventDispatcher = new Map<MaterialEventType, Subject<{}>>();
+        for (const val in MaterialEventType) {
+            this.materialEventDispatcher.set(val as MaterialEventType, new Subject<{}>());
+        }
+    }
+
+    addEventListener(eventType: MaterialEventType, callback: () => void) {
+        this.materialEventDispatcher.get(eventType).subscribe(callback);
     }
 
     /**
      * Initialize Uniforms Locations for Material
      */
-    private initUniforms(): void {
-        this.uniformColor = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_material.color');
-        this.uniformAmbience = this.gl2.getUniformLocation(this.shader.ShaderProgram,
-        'u_material.ambience');
-        this.uniformDiffuse = this.gl2.getUniformLocation(this.shader.ShaderProgram,
-        'u_material.diffuse');
-        this.uniformSpecular = this.gl2.getUniformLocation(this.shader.ShaderProgram,
-        'u_material.specular');
-        this.uniformShininess = this.gl2.getUniformLocation(this.shader.ShaderProgram,
-        'u_material.shininess');
-        this.updateTexCordsUniforms();
+    private updateUniforms(program: WebGLProgram): void {
+        if (this.shader?.ShaderProgram) {
+            this.uniformColor = this.gl2.getUniformLocation(program, 'u_material.color');
+            this.uniformAmbience = this.gl2.getUniformLocation(program, 'u_material.ambience');
+            this.uniformDiffuse = this.gl2.getUniformLocation(program, 'u_material.diffuse');
+            this.uniformSpecular = this.gl2.getUniformLocation(program, 'u_material.specular');
+            this.uniformShininess = this.gl2.getUniformLocation(program, 'u_material.shininess');
+            this.updateTexCordsUniforms(program);
+        }
     }
 
-    private updateTexCordsUniforms() {
-        if (this.textures.length > 0) {
+    private updateTexCordsUniforms(program: WebGLProgram) {
+        if (this.textures.length > 0 && this.shader?.ShaderProgram) {
             this.textures.forEach((texture, index) => {
-                const uLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_texture.tsampler`);
+                const uLocation = this.gl2.getUniformLocation(program, `u_texture.tsampler`);
                 this.uniformSamplers.push(uLocation);
-                const uTriggerLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_texture.tsampler_check`);
+                const uTriggerLocation = this.gl2.getUniformLocation(program, `u_texture.tsampler_check`);
                 this.uniformSamplerTriggers.push(uTriggerLocation);
             });
-            this.tilingUniformLocation = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_tiling');
+            this.tilingUniformLocation = this.gl2.getUniformLocation(program, 'u_tiling');
         }
     }
 
@@ -82,7 +100,7 @@ export class PhongShadingMaterial implements EngineLifecycle{
         const texture = new Texture2D(this.gl2, texturePath);
         this.textures[0] = texture;
         texture.onInit();
-        this.updateTexCordsUniforms();
+        this.updateTexCordsUniforms(this.shader.ShaderProgram);
         return texture;
     }
 
@@ -166,26 +184,28 @@ export class PhongShadingMaterial implements EngineLifecycle{
      * ShaderProgram
      */
     public get ShaderProgram(): WebGLProgram {
-        return this.shader.ShaderProgram;
+        return this.shader?.ShaderProgram;
     }
-
+    
     /**
      * Applying Material
      */
     public bind(): void {
-        if (this.textures.length > 0) {
-            this.textures.forEach((texture, index) => {
-                texture.bind(index);
-                this.gl2.uniform1i(this.uniformSamplers[index], index);
-                this.gl2.uniform1i(this.uniformSamplerTriggers[index], 1);
-            });
-            this.gl2.uniform2fv(this.tilingUniformLocation, this.tiling);
+        if (this.shader?.ShaderProgram) {
+            if (this.textures.length > 0) {
+                this.textures.forEach((texture, index) => {
+                    texture.bind(index);
+                    this.gl2.uniform1i(this.uniformSamplers[index], index);
+                    this.gl2.uniform1i(this.uniformSamplerTriggers[index], 1);
+                });
+                this.gl2.uniform2fv(this.tilingUniformLocation, this.tiling);
+            }
+            this.gl2.uniform4fv(this.uniformColor, this.color);
+            this.gl2.uniform1f(this.uniformAmbience, this.ambience);
+            this.gl2.uniform1f(this.uniformDiffuse, this.diffuse);
+            this.gl2.uniform1f(this.uniformSpecular, this.specular);
+            this.gl2.uniform1f(this.uniformShininess, this.shininess);
         }
-        this.gl2.uniform4fv(this.uniformColor, this.color);
-        this.gl2.uniform1f(this.uniformAmbience, this.ambience);
-        this.gl2.uniform1f(this.uniformDiffuse, this.diffuse);
-        this.gl2.uniform1f(this.uniformSpecular, this.specular);
-        this.gl2.uniform1f(this.uniformShininess, this.shininess);
     }
 
     public unbind() {

@@ -18,19 +18,15 @@ export class UVSphereCreator {
                 let x = radius * Math.cos(id) * Math.sin(jd);
                 let z = radius * Math.sin(id) * Math.sin(jd);
                 let y = radius * Math.cos(jd);
-
-                x = Number(x.toPrecision(2));
-                y = Number(y.toPrecision(2));
-                z = Number(z.toPrecision(2));
-
+                
                 const point: vec3 = vec3.fromValues(x , y , z);
                 vertices.push([x , y , z]);
 
                 let normal: vec3 = vec3.create();
                 normal = vec3.normalize(normal, point);
-                let n1 = Number(normal[0].toPrecision(2));
-                let n2 = Number(normal[1].toPrecision(2));
-                let n3 = Number(normal[2].toPrecision(2));
+                let n1 = Number(normal[0]);
+                let n2 = Number(normal[1]);
+                let n3 = Number(normal[2]);
 
                 normals.push([n1, n2, n3]);
             }
