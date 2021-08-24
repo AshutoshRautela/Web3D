@@ -18,10 +18,10 @@ try {
         cottage.Material.setDiffuseStrength(0.8);
         cottage.Material.setSpecularStrength(0);
 
-        const sphereMap = Model.createRenderableMode(scene, new Mesh(SphereMap.meshdata), Shaders.Unlit);
-        sphereMap.Material.setTexture('skySpheres/Skysphere2.jpeg');
-        sphereMap.Transform.setScale(vec3.fromValues(500, 500 , 500));
-        sphereMap.Transform.setEulerAngles(vec3.fromValues(0, 0 , 180));
+        // const sphereMap = Model.createRenderableMode(scene, new Mesh(SphereMap.meshdata), Shaders.Unlit);
+        // sphereMap.Material.setTexture('skySpheres/Skysphere2.jpeg');
+        // sphereMap.Transform.setScale(vec3.fromValues(500, 500 , 500));
+        // sphereMap.Transform.setEulerAngles(vec3.fromValues(0, 0 , 180));
 
         const ground = Primitive.createPrimitive(scene, PrimitiveType.Quad);
         ground.Material.setTexture('textures/MudTexture.jpeg');
@@ -36,7 +36,7 @@ try {
         scene.AddCamera(camera);
         scene.Add(ground);
         scene.AddLight(dirLight);
-        scene.Add(sphereMap);
+        // scene.Add(sphereMap);
         scene.ClearColor = vec4.fromValues(0.3 , 0.3 , 0.9, 1.0);
 
         let cameraSpeed = 0.1;

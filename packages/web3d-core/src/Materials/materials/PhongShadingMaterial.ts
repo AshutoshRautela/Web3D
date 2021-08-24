@@ -1,7 +1,9 @@
 import { vec2, vec4 } from "gl-matrix";
 import { Subject } from "rxjs";
 import { EngineLifecycle } from "../../EngineLifeCycle";
-import { Scene } from "../../SceneManagement";
+import { PointLight } from "../../Lights";
+import { DirectionalLight } from "../../Lights/lights/DirectionalLight";
+import { Scene, SceneEventType } from "../../SceneManagement";
 import { Shader, Shaders } from "../../Shader";
 import { Texture2D } from "../../Texture2D/Texture2D";
 
@@ -28,14 +30,27 @@ export class PhongShadingMaterial implements EngineLifecycle {
     private uniformSamplers: WebGLUniformLocation[];
     private uniformSamplerTriggers: WebGLUniformLocation[];
 
+    private uniformDLightsCount: WebGLUniformLocation;
+    private uniformDLightsColor: WebGLUniformLocation[] = [];
+    private uniformDLightsDirection: WebGLUniformLocation[] = [];
+    private uniformDLightsIntensity: WebGLUniformLocation[] = [];
+
+    private uniformPLightsCount: WebGLUniformLocation;
+    private uniformPLightsColor: WebGLUniformLocation[] = [];
+    private uniformPLightsPosition: WebGLUniformLocation[] = [];
+    private uniformPLightsIntensity: WebGLUniformLocation[] = [];
+    private uniformPLightsAttenC: WebGLUniformLocation[] = [];
+
     private textures: Texture2D[];
 
     private tilingUniformLocation: WebGLUniformLocation;
     private tiling: vec2;
 
     private materialEventDispatcher: Map<MaterialEventType, Subject<{}>>;
+    private gl2: WebGL2RenderingContext;
 
-    constructor(private gl2: WebGL2RenderingContext, textures?: Texture2D[], shaderType?: Shaders) {
+    constructor(private scene3D: Scene, textures?: Texture2D[], shaderType?: Shaders) {
+        this.gl2 = this.scene3D.WebGLContext;
         this.setupMaterialEventDispatcher();
         this.textures = textures || [new Texture2D(this.gl2)];
         this.uniformSamplers = [];
@@ -44,10 +59,12 @@ export class PhongShadingMaterial implements EngineLifecycle {
         if (this.textures) {
             this.textures.forEach((texture) => texture.onInit());
         }
-        this.shader = shaderType ? Shader.createShader(gl2, shaderType) : Shader.createShader(gl2, Shaders.StandardPhong);
+        this.shader = shaderType ? Shader.createShader(this.gl2, shaderType) : Shader.createShader(this.gl2, Shaders.StandardPhong);
         this.setColor(vec4.fromValues(1, 1, 1, 1));
         this.tiling = vec2.fromValues(1, 1);
         this.updateUniforms(this.shader.ShaderProgram);
+
+        this.scene3D.addEventListener(SceneEventType.OnLightAdd, this.initLightsUniforms.bind(this));
     }
 
     private setupMaterialEventDispatcher() {
@@ -66,12 +83,33 @@ export class PhongShadingMaterial implements EngineLifecycle {
      */
     private updateUniforms(program: WebGLProgram): void {
         if (this.shader?.ShaderProgram) {
+            this.initLightsUniforms();
+
             this.uniformColor = this.gl2.getUniformLocation(program, 'u_material.color');
             this.uniformAmbience = this.gl2.getUniformLocation(program, 'u_material.ambience');
             this.uniformDiffuse = this.gl2.getUniformLocation(program, 'u_material.diffuse');
             this.uniformSpecular = this.gl2.getUniformLocation(program, 'u_material.specular');
             this.uniformShininess = this.gl2.getUniformLocation(program, 'u_material.shininess');
             this.updateTexCordsUniforms(program);
+        }
+    }
+
+    private initLightsUniforms(): void {
+        if (this.shader?.ShaderProgram) {
+            this.uniformDLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_dLights.numLights');
+            this.scene3D.DirectionalLights.forEach((dLight: DirectionalLight, index: number) => {
+                this.uniformDLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].color`));
+                this.uniformDLightsDirection.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].direction`));
+                this.uniformDLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_dLights.lights[${index}].intensity`));
+            });
+
+            this.uniformPLightsCount = this.gl2.getUniformLocation(this.shader.ShaderProgram, 'u_pLights.numLights');
+            this.scene3D.PointLights.forEach((pLight: PointLight, index: number) => {
+                this.uniformPLightsColor.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].color`));
+                this.uniformPLightsPosition.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].position`));
+                this.uniformPLightsIntensity.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].intensity`));
+                this.uniformPLightsAttenC.push(this.gl2.getUniformLocation(this.shader.ShaderProgram, `u_pLights.lights[${index}].attenuationCoeff`));
+            });
         }
     }
 
@@ -192,6 +230,25 @@ export class PhongShadingMaterial implements EngineLifecycle {
      */
     public bind(): void {
         if (this.shader?.ShaderProgram) {
+            if (this.scene3D.PointLights.length > 0) {
+                console.log("Setting Lights Uniform ", this.scene3D.PointLights.length);
+                this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length);
+                this.scene3D.PointLights.forEach((pointLight: PointLight, index: number) => {
+                    this.gl2.uniform3fv(this.uniformPLightsColor[index], pointLight.Color);
+                    this.gl2.uniform3fv(this.uniformPLightsPosition[index], pointLight.Position);
+                    this.gl2.uniform1f(this.uniformPLightsIntensity[index], pointLight.Intensity);
+                    this.gl2.uniform3fv(this.uniformPLightsAttenC[index], pointLight.AttenuationCoeff);
+                });
+            };
+            if (this.scene3D.DirectionalLights.length > 0) {
+                this.gl2.uniform1i(this.uniformDLightsCount, this.scene3D.DirectionalLights.length);
+                this.scene3D.DirectionalLights.forEach((directionLight: DirectionalLight, index: number) => {
+                    this.gl2.uniform3fv(this.uniformDLightsColor[index], directionLight.Color);
+                    this.gl2.uniform3fv(this.uniformDLightsDirection[index], directionLight.Direction);
+                    this.gl2.uniform1f(this.uniformDLightsIntensity[index], directionLight.Intensity);
+                });
+            }
+
             if (this.textures.length > 0) {
                 this.textures.forEach((texture, index) => {
                     texture.bind(index);
