@@ -6,6 +6,7 @@ import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
 import { MeshRenderer } from "../../MeshRenderer";
 import { UVSphereCreator } from "../../GeometryCreator";
 import { Model } from "./Model";
+import { PhongShadingMaterial } from "../../Materials";
 
 export enum PrimitiveType {
     Cube,
@@ -24,7 +25,7 @@ export  class Primitive extends Model {
     ) {
         super(scene3D, meshRenderer);
         if (primitiveType === PrimitiveType.Cube) {
-            this.material.setTexture('/textures/BrickWall2.jpeg');
+            (this.material as PhongShadingMaterial).setTexture('/textures/BrickWall2.jpeg');
         }
     }
 

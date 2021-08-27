@@ -12,7 +12,7 @@ try {
 
         const camera = new Camera(scene, vec3.fromValues(0, 3, -35));
 
-        const cottage = Model.createRenderableMode(scene, new Mesh(CottageMesh.meshdata))
+        const cottage = Model.createRenderableMode(scene, new Mesh(CottageMesh.meshdata));
         cottage.Transform.setScale(vec3.fromValues(3, 3 , 3));
         cottage.Material.setTexture('textures/Cottage_Dirt_Base_Color.png');
         cottage.Material.setDiffuseStrength(0.8);

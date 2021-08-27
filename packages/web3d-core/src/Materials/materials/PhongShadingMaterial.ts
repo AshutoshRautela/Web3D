@@ -1,25 +1,31 @@
-import { vec2, vec4 } from "gl-matrix";
+import { mat4, vec2, vec4 } from "gl-matrix";
 import { Subject } from "rxjs";
 import { EngineLifecycle } from "../../EngineLifeCycle";
 import { PointLight } from "../../Lights";
 import { DirectionalLight } from "../../Lights/lights/DirectionalLight";
 import { Scene, SceneEventType } from "../../SceneManagement";
 import { Shader, Shaders } from "../../Shader";
-import { Texture2D } from "../../Texture2D/Texture2D";
+import { Model } from "../../Shapes";
+import { Texture2D } from "../../Textures/texture/Texture2D";
+import { Time } from "../../Time";
+import { Material } from "./Material";
 
 export enum MaterialEventType {
     ShaderUpdate = "ShaderUpdate"
 }
 
-export class PhongShadingMaterial implements EngineLifecycle {
+export class PhongShadingMaterial extends Material {
 
-    private shader: Shader;
     private color: vec4 = vec4.create();
 
     private ambience: number = 0.3;
     private diffuse: number = 0.4;
     private specular: number = 0.2;
     private shininess: number = 2.0;
+
+    private timeUniformLocation!: WebGLUniformLocation | null;
+    private mvpUniformLocation!: WebGLUniformLocation | null;
+    private modelUniformLocation: WebGLUniformLocation | null;
 
     private uniformColor: WebGLUniformLocation | null;
     private uniformAmbience: WebGLUniformLocation | null;
@@ -47,9 +53,9 @@ export class PhongShadingMaterial implements EngineLifecycle {
     private tiling: vec2;
 
     private materialEventDispatcher: Map<MaterialEventType, Subject<{}>>;
-    private gl2: WebGL2RenderingContext;
 
-    constructor(private scene3D: Scene, textures?: Texture2D[], shaderType?: Shaders) {
+    constructor(protected scene3D: Scene, private model: Model, textures?: Texture2D[], shaderType?: Shaders) {
+        super(scene3D, shaderType);
         this.gl2 = this.scene3D.WebGLContext;
         this.setupMaterialEventDispatcher();
         this.textures = textures || [new Texture2D(this.gl2)];
@@ -83,6 +89,10 @@ export class PhongShadingMaterial implements EngineLifecycle {
      */
     private updateUniforms(program: WebGLProgram): void {
         if (this.shader?.ShaderProgram) {
+            this.timeUniformLocation = this.gl2.getUniformLocation(program, 'u_time');
+            this.mvpUniformLocation = this.gl2.getUniformLocation(program, 'u_mvp');
+            this.modelUniformLocation = this.gl2.getUniformLocation(program, 'u_model');
+
             this.initLightsUniforms();
 
             this.uniformColor = this.gl2.getUniformLocation(program, 'u_material.color');
@@ -217,19 +227,22 @@ export class PhongShadingMaterial implements EngineLifecycle {
     public get Shininess(): number {
         return this.shininess;
     }
-
-    /**
-     * ShaderProgram
-     */
-    public get ShaderProgram(): WebGLProgram {
-        return this.shader?.ShaderProgram;
-    }
     
     /**
      * Applying Material
      */
     public bind(): void {
         if (this.shader?.ShaderProgram) {
+            let mvMatrix: mat4 = mat4.create();
+            mvMatrix = mat4.multiply(mvMatrix, this.scene3D.RenderCamera.ProjectionMatrix, this.scene3D.RenderCamera.ViewMatrix);
+            mvMatrix = mat4.multiply(mvMatrix, mvMatrix, this.model.Transform.ModelMatrix);
+
+            this.gl2.useProgram(this.ShaderProgram);
+
+            this.gl2.uniform1f(this.timeUniformLocation, Time.time);
+            this.gl2.uniformMatrix4fv(this.mvpUniformLocation, false, mvMatrix);
+            this.gl2.uniformMatrix4fv(this.modelUniformLocation, false, this.model.Transform.ModelMatrix);
+
             if (this.scene3D.PointLights.length > 0) {
                 console.log("Setting Lights Uniform ", this.scene3D.PointLights.length);
                 this.gl2.uniform1i(this.uniformPLightsCount, this.scene3D.PointLights.length);

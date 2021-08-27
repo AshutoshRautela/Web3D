@@ -12,6 +12,6 @@ export * from './src/Materials';
 export * from './src/Lights';
 export * from './src/GeometryCreator';
 export * from './src/Input';
-export * from './src/Texture2D/Texture2D';
+export * from './src/Textures';
 export * from './src/Web3d';
 export * from './src/Time';

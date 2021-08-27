@@ -1,5 +1,5 @@
-import { EngineLifecycle } from "../EngineLifeCycle";
-import { Util } from "../Util";
+import { EngineLifecycle } from "../../EngineLifeCycle";
+import { Util } from "../../Util";
 
 export class Texture2D implements EngineLifecycle {
 
