@@ -16,9 +16,9 @@ export class Camera extends SceneObject {
         this.viewMatrix = mat4.create();
         this.projectionMatrix = mat4.create();
 
-        this.cameraForward = vec3.fromValues(0 , 0 , 1);
-        this.cameraRight = vec3.create();
-        this.cameraUp = vec3.create();
+        this.cameraForward = vec3.fromValues(0 , 0 , 1); // n
+        this.cameraRight = vec3.create();    // u 
+        this.cameraUp = vec3.create();  // v
 
         position && this.transform.setPosition(position);
         eulerAngles && this.transform.setEulerAngles(eulerAngles);
@@ -40,16 +40,22 @@ export class Camera extends SceneObject {
         this.viewMatrix = this.getViewMatrix();
 
         // Generating a view matrix for camera looking at the origin
-        // this.viewMatrix = mat4.lookAt(this.viewMatrix, this.transform.position, this.cameraForward, vec3.fromValues(0 , 1 , 0));
+        // this.viewMatrix = mat4.lookAt(this.viewMatrix, vec3.fromValues(this.transform.position[0], this.transform.position[1], this.transform.position[2]), this.cameraForward, vec3.fromValues(0 , 1 , 0));
         // this.viewMatrix = mat4.transpose(this.viewMatrix, this.viewMatrix);
     }
+
+
 
     // Generating LookAt Matrix
     getViewMatrix(): mat4 {
         this.cameraForward = vec3.fromValues(0 , 0 , -1);
-        // this.cameraRight = vec3.cross(this.cameraRight ,  vec3.fromValues(0 , 1 , 0), this.cameraForward);
-        // this.cameraUp = vec3.cross(this.cameraUp, this.cameraForward, this.cameraRight);
-        this.cameraRight = vec3.cross(this.cameraRight , this.cameraForward, vec3.fromValues(0 , 1 , 0));
+        this.cameraForward = vec3.rotateX(this.cameraForward, this.cameraForward, vec3.create(), Util.DegreesToRadians(this.Transform.eulerAngles[0]));
+        this.cameraForward = vec3.rotateY(this.cameraForward, this.cameraForward, vec3.create(), Util.DegreesToRadians(this.Transform.eulerAngles[1]));
+
+        let vecUp = vec3.fromValues(0 , 1 , 0);
+        vecUp = vec3.rotateZ(vecUp, vecUp, vec3.create(), Util.DegreesToRadians(this.transform.eulerAngles[2]));
+        
+        this.cameraRight = vec3.cross(this.cameraRight , this.cameraForward, vecUp);
         this.cameraUp = vec3.cross(this.cameraUp, this.cameraRight, this.cameraForward);
 
         const dMatrix = mat4.fromValues(
@@ -64,6 +70,10 @@ export class Camera extends SceneObject {
         let vMatrix = mat4.create();
         vMatrix = mat4.multiply(vMatrix, dMatrix, tMatrix);
         return vMatrix;
+    }
+
+    public get LocalForward(): vec3 {
+        return vec3.fromValues(-this.cameraForward[0], -this.cameraForward[1], -this.cameraForward[2]);
     }
 
     public get ViewMatrix(): mat4 {

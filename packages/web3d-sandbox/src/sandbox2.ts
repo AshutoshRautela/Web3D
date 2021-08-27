@@ -9,7 +9,7 @@ try {
         const scene: Scene = SceneManager.createScene("TestScene1", { width: window.innerWidth, height: window.innerHeight });
         document.body.appendChild(scene.CanvasElement);
 
-        const camera = new Camera(scene, vec3.fromValues(0, 3, -35));
+        const camera = new Camera(scene, vec3.fromValues(0, 3, -80));
 
         const cottage = Model.createRenderableMode(scene, new Mesh(CottageMesh.meshdata));
         cottage.Transform.setScale(vec3.fromValues(3, 3 , 3));
@@ -44,19 +44,19 @@ try {
 
         scene.ClearColor = vec4.fromValues(0.1 , 0.1 , 0.1, 1.0);
 
-        let cameraSpeed = 0.1;
+        let cameraSpeed = 0.2;
         cubemap.Transform.setScale(vec3.fromValues(10 ,10 , 10));
 
         const renderLoop = () => {
             try {
                 Time.update();
                 scene.draw();
-
+                
                 if (Input.IsKeyPressed(KeyCode.W)) {
-                    camera.Transform.Translate(vec3.fromValues(0 , 0 , 1 * cameraSpeed));
+                    camera.Transform.Translate(vec3.fromValues(camera.LocalForward[0] * cameraSpeed, camera.LocalForward[1] * cameraSpeed, camera.LocalForward[2] * cameraSpeed));
                 }
                 if (Input.IsKeyPressed(KeyCode.S)) {
-                    camera.Transform.Translate(vec3.fromValues(0 , 0 , -1 * cameraSpeed));
+                    camera.Transform.Translate(vec3.fromValues(-camera.LocalForward[0] * cameraSpeed, -camera.LocalForward[1] * cameraSpeed, -camera.LocalForward[2] * cameraSpeed));
                 }
                 if (Input.IsKeyPressed(KeyCode.A)) {
                     camera.Transform.Translate(vec3.fromValues(-1 * cameraSpeed , 0 , 0));
@@ -64,6 +64,13 @@ try {
                 if (Input.IsKeyPressed(KeyCode.D)) {
                     camera.Transform.Translate(vec3.fromValues(1 * cameraSpeed , 0 , 0));
                 }
+                if (Input.IsKeyPressed(KeyCode.E)) {
+                    camera.Transform.Rotate(vec3.fromValues(0, cameraSpeed * 4 , 0));
+                }
+                if (Input.IsKeyPressed(KeyCode.Q)) {
+                    camera.Transform.Rotate(vec3.fromValues(0, -cameraSpeed * 4 , 0));
+                }
+
                 window.requestAnimationFrame(renderLoop);
             }
             catch (e) {
