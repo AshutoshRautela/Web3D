@@ -16,7 +16,7 @@ export class Camera extends SceneObject {
         this.viewMatrix = mat4.create();
         this.projectionMatrix = mat4.create();
 
-        this.cameraForward = vec3.create();
+        this.cameraForward = vec3.fromValues(0 , 0 , 1);
         this.cameraRight = vec3.create();
         this.cameraUp = vec3.create();
 
@@ -35,12 +35,13 @@ export class Camera extends SceneObject {
     onRender() {
         this.transform.onRender();
 
-        this.cameraForward = vec3.add(this.cameraForward, this.transform.position, vec3.fromValues(0 , 0 , 1));
+        // this.cameraForward = vec3.add(this.cameraForward, this.transform.position, vec3.fromValues(0 , 0 , 1));
 
         this.viewMatrix = this.getViewMatrix();
 
         // Generating a view matrix for camera looking at the origin
         // this.viewMatrix = mat4.lookAt(this.viewMatrix, this.transform.position, this.cameraForward, vec3.fromValues(0 , 1 , 0));
+        // this.viewMatrix = mat4.transpose(this.viewMatrix, this.viewMatrix);
     }
 
     // Generating LookAt Matrix

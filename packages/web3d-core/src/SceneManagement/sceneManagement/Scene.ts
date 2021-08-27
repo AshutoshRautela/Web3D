@@ -43,7 +43,7 @@ export class Scene {
         if (!this.gl2) {
             throw "Error getting WebGL Context";
         }
-        this.clearColor = vec4.fromValues(0.05, 0.05, 0.05, 1.0);
+        this.clearColor = vec4.fromValues(0.01, 0.01, 0.01, 1.0);
 
         this.prepareEventDispatcher();
         this.resizeScene(size, true);

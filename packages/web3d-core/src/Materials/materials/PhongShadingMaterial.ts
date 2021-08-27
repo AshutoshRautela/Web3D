@@ -1,6 +1,5 @@
 import { mat4, vec2, vec4 } from "gl-matrix";
 import { Subject } from "rxjs";
-import { EngineLifecycle } from "../../EngineLifeCycle";
 import { PointLight } from "../../Lights";
 import { DirectionalLight } from "../../Lights/lights/DirectionalLight";
 import { Scene, SceneEventType } from "../../SceneManagement";
