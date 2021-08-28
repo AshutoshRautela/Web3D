@@ -4,9 +4,10 @@ import { MeshData } from "../../interfaces";
 // Loading Obj Models
 import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
 import { MeshRenderer } from "../../MeshRenderer";
-import { UVSphereCreator } from "../../GeometryCreator";
+import { CylinderCreator, UVSphereCreator } from "../../GeometryCreator";
 import { Model } from "./Model";
 import { PhongShadingMaterial } from "../../Materials";
+import { Shaders, ShaderType } from "../../Shader";
 
 export enum PrimitiveType {
     Cube,
@@ -21,12 +22,11 @@ export  class Primitive extends Model {
 
     constructor(scene3D: Scene,
          meshRenderer: MeshRenderer,
-         private primitiveType: PrimitiveType
+         private primitiveType: PrimitiveType,
+         private shaderType?: Shaders
     ) {
         super(scene3D, meshRenderer);
-        if (primitiveType === PrimitiveType.Cube) {
-            (this.material as PhongShadingMaterial).setTexture('/textures/BrickWall2.jpeg');
-        }
+        this.material = new PhongShadingMaterial(scene3D, this, [], shaderType);
     }
 
     onRender(deltaTime: number) {
@@ -37,14 +37,15 @@ export  class Primitive extends Model {
         super.onDestroy();
     }
 
-    static createPrimitive(scene3D: Scene, primitiveType: PrimitiveType): Primitive {
+    static createPrimitive(scene3D: Scene, primitiveType: PrimitiveType, shaderType: Shaders): Primitive {
         let primitive: Primitive;
         if (primitiveType == PrimitiveType.Quad) {
             const mesh = new Mesh(require('../../MeshFiles/Json/QuadMesh.json'));
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         else if (primitiveType == PrimitiveType.Cube) {
@@ -52,16 +53,18 @@ export  class Primitive extends Model {
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         else if (primitiveType == PrimitiveType.Sphere) {
-            const meshData = UVSphereCreator.createGeometry();
+            const meshData = UVSphereCreator.createGeometry(1, 5);
             const mesh = new Mesh(meshData);
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         else if (primitiveType == PrimitiveType.Cone) {
@@ -69,15 +72,18 @@ export  class Primitive extends Model {
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         else if (primitiveType == PrimitiveType.Cylinder) {
-            const mesh = new Mesh(require('../../MeshFiles/Json/CylinderMesh.json'));
+            const meshData = CylinderCreator.createGeometry();
+            const mesh = new Mesh(meshData);
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         else if (primitiveType == PrimitiveType.Monkey) {
@@ -91,7 +97,8 @@ export  class Primitive extends Model {
             primitive = new Primitive(
                 scene3D,
                 new MeshRenderer(scene3D.WebGLContext, mesh),
-                primitiveType
+                primitiveType,
+                shaderType || Shaders.StandardPhong
             );
         }
         return primitive;

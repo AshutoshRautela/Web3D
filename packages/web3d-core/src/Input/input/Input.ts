@@ -1,5 +1,5 @@
 import { KeyboardHandler, KeyCode } from "./KeyboardHandler";
-import { MouseButton, MouseDetails, MouseHandler, MouseWheelDetails } from "./MouseHandler";
+import { MouseButton, MouseDetails, MouseHandler, MouseMoveDetails, MouseWheelDetails } from "./MouseHandler";
 export {
     MouseButton,
     MouseDetails,
@@ -34,5 +34,9 @@ export class Input {
 
     public static OnMouseWheel(): MouseWheelDetails {
         return MouseHandler.OnMouseWheel();
+    }
+
+    public static OnMouseMove(): MouseMoveDetails {
+        return MouseHandler.OnMouseMove();
     }
 }

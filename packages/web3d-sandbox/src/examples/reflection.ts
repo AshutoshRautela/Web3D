@@ -1,27 +1,18 @@
-import { vec2, vec3, vec4 } from 'gl-matrix';
-import { Cubemap, SceneManager, Model, Mesh, DirectionalLight, Camera, Time, Scene, Web3D, PrimitiveType, Primitive, Input, KeyCode, MouseButton, Shader, ShaderType, Shaders, CubemapTexture } from 'web3d-core';
-
-// 3D Models
-import CottageMesh from './Mesh/Cottage_v2.obj';
+import { vec3, vec4 } from 'gl-matrix';
+import { Cubemap, SceneManager, DirectionalLight, Camera, Time, Scene, Web3D, PrimitiveType, Primitive, Input, KeyCode, CubemapTexture, Shaders } from 'web3d-core';
 
 try {
     if (Web3D.init()) {
         const scene: Scene = SceneManager.createScene("TestScene1", { width: window.innerWidth, height: window.innerHeight });
         document.body.appendChild(scene.CanvasElement);
 
-        const camera = new Camera(scene, vec3.fromValues(0, 3, -80));
+        const camera = new Camera(scene, vec3.fromValues(0, 1.5, -30));
 
-        const cottage = Model.createRenderableMode(scene, new Mesh(CottageMesh.meshdata));
-        cottage.Transform.setScale(vec3.fromValues(3, 3 , 3));
-        cottage.Material.setTexture('textures/Cottage_Dirt_Base_Color.png');
-        cottage.Material.setDiffuseStrength(0.8);
-        cottage.Material.setSpecularStrength(0);
+        const sphere = Primitive.createPrimitive(scene, PrimitiveType.Sphere, Shaders.Reflective);
+        const smoothMonkey = Primitive.createPrimitive(scene, PrimitiveType.Monkey, Shaders.Reflective);
+        const cylinder = Primitive.createPrimitive(scene, PrimitiveType.Cylinder, Shaders.Reflective);
 
-        const ground = Primitive.createPrimitive(scene, PrimitiveType.Quad);
-        ground.Material.setTexture('textures/MudTexture.jpeg');
-        ground.Material.setTiling(vec2.fromValues(100 , 100));
-        ground.Transform.setScale(vec3.fromValues(200, 200, 1));
-        ground.Transform.setEulerAngles(vec3.fromValues(90, 0, 0));
+        const cube = Primitive.createPrimitive(scene, PrimitiveType.Cube, Shaders.Reflective);
 
         const cubemap = Cubemap.createCubemap(scene, new CubemapTexture(
             scene.WebGLContext,
@@ -36,16 +27,22 @@ try {
         const dirLight = new DirectionalLight();
         dirLight.setDirection(vec3.fromValues(1, -1, 0));
         
-        scene.Add(cottage);
         scene.AddCamera(camera);
-        scene.Add(ground);
-        scene.AddLight(dirLight);
+        scene.Add(sphere);
+        scene.Add(cube);
+        scene.Add(smoothMonkey);
+        scene.Add(cylinder);
         scene.Add(cubemap);
 
         scene.ClearColor = vec4.fromValues(0.1 , 0.1 , 0.1, 1.0);
 
         let cameraSpeed = 0.2;
         cubemap.Transform.setScale(vec3.fromValues(10 ,10 , 10));
+
+        sphere.Transform.setPosition(vec3.fromValues(5 , 0 , 0));
+        cube.Transform.setPosition(vec3.fromValues(-5 , 0 , 0));
+
+        cylinder.Transform.setPosition(vec3.fromValues(5 , 3, 0));
 
         const renderLoop = () => {
             try {
@@ -69,6 +66,13 @@ try {
                 }
                 if (Input.IsKeyPressed(KeyCode.Q)) {
                     camera.Transform.Rotate(vec3.fromValues(0, -cameraSpeed * 4 , 0));
+                }
+
+                if (Input.IsKeyPressed(KeyCode.X)) {
+                    camera.Transform.Rotate(vec3.fromValues(-cameraSpeed * 4 , 0, 0));
+                }
+                if (Input.IsKeyPressed(KeyCode.Z)) {
+                    camera.Transform.Rotate(vec3.fromValues(cameraSpeed * 4 , 0, 0));
                 }
 
                 window.requestAnimationFrame(renderLoop);

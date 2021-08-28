@@ -3,6 +3,7 @@ import { DirectionalLight, Light, PointLight } from '../../Lights'
 import { SceneObject } from '../../SceneObject';
 import { Subject, Subscription } from 'rxjs';
 import { vec4 } from 'gl-matrix';
+import { Cubemap } from '../../Shapes';
 
 export interface ViewportSize {
     width: number;
@@ -28,6 +29,7 @@ export class Scene {
     private gl2: WebGL2RenderingContext;
 
     private renderCamera!: Camera;
+    private cubemap: Cubemap;
     private renderableObjects: SceneObject[] = [];
 
     private directionalLights: DirectionalLight[] = [];
@@ -118,6 +120,9 @@ export class Scene {
     }
 
     public Add(sObject: SceneObject) {
+        if (sObject instanceof Cubemap)  {
+            this.cubemap = sObject;
+        }
         this.renderableObjects.push(sObject);
         this.sceneEventDispatcher.get(SceneEventType.OnRenderableObjectAdd).next({name: this.name});
     }
@@ -152,6 +157,10 @@ export class Scene {
 
     public get RenderCamera(): Camera {
         return this.renderCamera;
+    }
+
+    public get EnvironmentMap(): Cubemap {
+        return this.cubemap;
     }
 
     public get DirectionalLights(): DirectionalLight[] {

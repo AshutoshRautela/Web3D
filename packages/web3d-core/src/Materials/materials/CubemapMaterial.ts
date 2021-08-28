@@ -39,4 +39,8 @@ export class CubemapMaterial extends Material {
     onDestroy() {
         this.shader.onDestroy();
     }
+
+    public get EMapTexture(): CubemapTexture {
+        return this.cubemapTexture;
+    }
 }

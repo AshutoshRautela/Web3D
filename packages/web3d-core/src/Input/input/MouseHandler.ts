@@ -16,11 +16,18 @@ export interface MouseWheelDetails {
     isWheeling: boolean;
     wheelValue: number;
 }
+export interface MouseMoveDetails {
+    isMoving: boolean;
+    pos: vec2;
+    delta: vec2;
+}
 
 export class MouseHandler {
 
     private static isMouseDownMap: Map<MouseButton, MouseDetails>;
+    private static mouseMoveDetails: MouseMoveDetails;
     private static wheelValue: number = 0;
+    
 
     private static onMouseDown = (event: MouseEvent) => {
         MouseHandler.isMouseDownMap.set(event.button, { isDown: true, pos: vec2.fromValues(event.clientX, event.clientY), delta: vec2.create() } );
@@ -41,6 +48,10 @@ export class MouseHandler {
                 }));
             }
         }
+        MouseHandler.mouseMoveDetails.isMoving = true;
+        MouseHandler.mouseMoveDetails.pos = vec2.fromValues(event.clientX, event.clientY);
+        MouseHandler.mouseMoveDetails.delta = vec2.fromValues(event.movementX, event.movementY);
+        requestAnimationFrame((() => MouseHandler.mouseMoveDetails = {isMoving: false, pos: vec2.create(), delta: vec2.create()}));
     }
 
     private static onMouseOut = () => {
@@ -62,6 +73,7 @@ export class MouseHandler {
 
     public static activateMouseInputSystem() {
         MouseHandler.isMouseDownMap = new Map<MouseButton, MouseDetails>();
+        MouseHandler.mouseMoveDetails = { isMoving: false, pos: vec2.create(), delta: vec2.create()};
         window.addEventListener('mousedown', MouseHandler.onMouseDown);
         window.addEventListener('mouseup', MouseHandler.onMouseUp);
         window.addEventListener('mousemove', MouseHandler.onMouseMove);
@@ -85,6 +97,10 @@ export class MouseHandler {
             isWheeling: MouseHandler.wheelValue != 0,
             wheelValue: MouseHandler.wheelValue
         }
+    }
+
+    public static OnMouseMove(): MouseMoveDetails {
+        return MouseHandler.mouseMoveDetails;
     }
 
     public static get IsMouseDownMap(): Map<MouseButton, MouseDetails> {

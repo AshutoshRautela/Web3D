@@ -57,7 +57,7 @@ export class PhongShadingMaterial extends Material {
         super(scene3D, shaderType);
         this.gl2 = this.scene3D.WebGLContext;
         this.setupMaterialEventDispatcher();
-        this.textures = textures || [new Texture2D(this.gl2)];
+        this.textures = !textures || textures.length == 0 ? [new Texture2D(this.gl2)] : textures;
         this.uniformSamplers = [];
         this.uniformSamplerTriggers = [];
 

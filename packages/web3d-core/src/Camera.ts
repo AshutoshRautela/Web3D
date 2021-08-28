@@ -29,7 +29,7 @@ export class Camera extends SceneObject {
     }
 
     private calulcateProjection() {
-        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(60),  this.scene3D.AspectRatio , 0.1, 1000);
+        this.projectionMatrix = mat4.perspective(this.projectionMatrix, Util.DegreesToRadians(45),  this.scene3D.AspectRatio , 0.1, 1000);
     }
 
     onRender() {

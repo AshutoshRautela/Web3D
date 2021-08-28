@@ -1,14 +1,13 @@
 const path = require('path');
-const webpack = require('webpack');
 
-const ROOT = path.resolve( __dirname, 'src',);
+const ROOT = path.resolve( __dirname, 'src/examples',);
 const DESTINATION = path.resolve( __dirname, 'dist' );
 
 module.exports = {
     context: ROOT,
 
     entry: {
-        'main': './sandbox2.ts'
+        'main': './reflection.ts'
     },
     
     output: {

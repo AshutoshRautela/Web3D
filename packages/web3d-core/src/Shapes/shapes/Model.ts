@@ -44,7 +44,7 @@ export class Model extends SceneObject {
         this.material.onDestroy();
     }
 
-    public get Material(): PhongShadingMaterial {
-        return this.material as PhongShadingMaterial;
+    public get Material(): Material {
+        return this.material;
     }
 }

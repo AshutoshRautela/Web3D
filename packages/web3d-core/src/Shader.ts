@@ -1,14 +1,15 @@
 import { EngineLifecycle } from './EngineLifeCycle';
 
 export enum ShaderType {
-    VERTEX,
-    FRAGMENT
+    VERTEX = "Vertex",
+    FRAGMENT = "Fragment"
 }
 
 export enum Shaders {
     StandardPhong,
     Unlit,
-    Skybox
+    Skybox,
+    Reflective
 }
 
 export class Shader implements EngineLifecycle {
@@ -92,6 +93,8 @@ export class Shader implements EngineLifecycle {
             shader = new Shader(gl2, require('./Shaders/Unlit/vert.glsl'), require('./Shaders/Unlit/frag.glsl'));
         } else if (shaderType === Shaders.Skybox) {
             shader = new Shader(gl2, require('./Shaders/skybox/vert.glsl'), require('./Shaders/skybox/frag.glsl'));
+        } else if (shaderType === Shaders.Reflective) {
+            shader = new Shader(gl2, require('./Shaders/reflective/vertex.glsl'), require('./Shaders/reflective/fragment.glsl'));
         }
         return shader;
     }
