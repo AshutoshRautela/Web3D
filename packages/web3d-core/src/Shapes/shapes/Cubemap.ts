@@ -3,6 +3,7 @@ import { CubemapMaterial } from "../../Materials/materials/CubemapMaterial";
 import { Mesh } from "../../Mesh";
 import { MeshRenderer } from "../../MeshRenderer";
 import { Scene } from "../../SceneManagement";
+import { Shaders } from "../../Shader";
 import { CubemapTexture } from "../../Textures";
 import { Model } from "./Model";
 

@@ -25,8 +25,7 @@ export  class Primitive extends Model {
          private primitiveType: PrimitiveType,
          private shaderType?: Shaders
     ) {
-        super(scene3D, meshRenderer);
-        this.material = new PhongShadingMaterial(scene3D, this, [], shaderType);
+        super(scene3D, meshRenderer, shaderType);
     }
 
     onRender(deltaTime: number) {

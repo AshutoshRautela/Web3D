@@ -1,5 +1,5 @@
 import { mat4 } from "gl-matrix";
-import { Material, PhongShadingMaterial } from "../../Materials";
+import { CubemapMaterial, Material, PhongShadingMaterial, ReflectiveMaterial } from "../../Materials";
 import { Scene, SceneEventType } from "../../SceneManagement";
 import { SceneObject } from "../../SceneObject";
 import { Transform } from "../../Transform";
@@ -17,7 +17,11 @@ export class Model extends SceneObject {
         shaderType?: Shaders
     ) {
         super(scene3D);
-        this.material = new PhongShadingMaterial(this.scene3D, this, [], shaderType || Shaders.StandardPhong);
+        if (shaderType && shaderType === Shaders.Reflective || shaderType === Shaders.Refractive) {
+            this.material = new ReflectiveMaterial(this.scene3D, this, shaderType);
+        } else {
+            this.material = new PhongShadingMaterial(this.scene3D, this, [], shaderType || Shaders.StandardPhong);
+        }
         this.transform = new Transform();
         this.meshRenderer.setShaderProgram(this.material.ShaderProgram);
         this.meshRenderer.onInit();

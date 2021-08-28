@@ -11,8 +11,8 @@ export class ReflectiveMaterial extends Material {
     private mvpUniformLocation: WebGLUniformLocation | null;
     private cameraPosUniformLocation: WebGLUniformLocation | null;
 
-    constructor(protected scene3D: Scene, private model: Model) {
-        super(scene3D, Shaders.Reflective);
+    constructor(protected scene3D: Scene, private model: Model, shaderType: Shaders) {
+        super(scene3D, shaderType);
         this.gl2 = this.scene3D.WebGLContext;
         this.initUniforms();
     }

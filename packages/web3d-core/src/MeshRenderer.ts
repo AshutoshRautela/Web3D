@@ -26,8 +26,8 @@ export class MeshRenderer implements EngineLifecycle {
     public bind(): void {
         this.gl2.bindVertexArray(this.vArrayObject);
         this.gl2.enableVertexAttribArray(this.vertex_AL);
-        this.mesh.ContainsNormals && this.gl2.enableVertexAttribArray(this.normal_AL);
-        this.mesh.ContainsTextCords && this.gl2.enableVertexAttribArray(this.textCord_AL);
+        this.mesh.ContainsNormals && this.normal_AL > 0 && this.gl2.enableVertexAttribArray(this.normal_AL);
+        this.mesh.ContainsTextCords && this.textCord_AL > 0 && this.gl2.enableVertexAttribArray(this.textCord_AL);
     }
 
     public draw() {
@@ -48,8 +48,8 @@ export class MeshRenderer implements EngineLifecycle {
 
     public unbind(): void {
         this.gl2.disableVertexAttribArray(this.vertex_AL);
-        this.mesh.ContainsNormals && this.gl2.disableVertexAttribArray(this.normal_AL);
-        this.mesh.ContainsTextCords && this.gl2.disableVertexAttribArray(this.textCord_AL);
+        this.mesh.ContainsNormals && this.normal_AL > 0 && this.gl2.disableVertexAttribArray(this.normal_AL);
+        this.mesh.ContainsTextCords && this.textCord_AL > 0 && this.gl2.disableVertexAttribArray(this.textCord_AL);
         this.gl2.bindVertexArray(null);
     }
 
@@ -96,7 +96,7 @@ export class MeshRenderer implements EngineLifecycle {
             );
             this.gl2.enableVertexAttribArray(this.vertex_AL);
 
-            if (this.mesh.ContainsNormals) {
+            if (this.mesh.ContainsNormals && this.normal_AL > 0) {
                 this.gl2.vertexAttribPointer(
                     this.normal_AL,
                     3,
@@ -108,7 +108,7 @@ export class MeshRenderer implements EngineLifecycle {
                 this.gl2.enableVertexAttribArray(this.normal_AL);
             }
 
-            if (this.mesh.ContainsTextCords) {
+            if (this.mesh.ContainsTextCords && this.textCord_AL > 0) {
                 this.gl2.vertexAttribPointer(
                     this.textCord_AL,
                     2,

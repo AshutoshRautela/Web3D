@@ -6,10 +6,11 @@ export enum ShaderType {
 }
 
 export enum Shaders {
-    StandardPhong,
-    Unlit,
-    Skybox,
-    Reflective
+    StandardPhong = "StandardPhong",
+    Unlit = "Unlit",
+    Skybox = "Skybox",
+    Reflective = "Reflective",
+    Refractive = "Refractive"
 }
 
 export class Shader implements EngineLifecycle {
@@ -95,6 +96,9 @@ export class Shader implements EngineLifecycle {
             shader = new Shader(gl2, require('./Shaders/skybox/vert.glsl'), require('./Shaders/skybox/frag.glsl'));
         } else if (shaderType === Shaders.Reflective) {
             shader = new Shader(gl2, require('./Shaders/reflective/vertex.glsl'), require('./Shaders/reflective/fragment.glsl'));
+        } else if (shaderType === Shaders.Refractive) {
+            console.log("Creating Refractive Shader");
+            shader = new Shader(gl2, require('./Shaders/refractive/vertex.glsl'), require('./Shaders/refractive/fragment.glsl'));
         }
         return shader;
     }
