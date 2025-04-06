@@ -1,13 +1,13 @@
 const path = require('path');
 
-const ROOT = path.resolve( __dirname, 'src/examples',);
+const ROOT = path.resolve( __dirname, 'src',);
 const DESTINATION = path.resolve( __dirname, 'dist' );
 
 module.exports = {
     context: ROOT,
 
     entry: {
-        'main': './reflection.ts'
+        'main': './sandbox.ts'
     },
     
     output: {
@@ -48,5 +48,14 @@ module.exports = {
     },
 
     devtool: 'cheap-module-source-map',
+
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'src'),
+        },
+        port: 9000,
+        compress: true,
+        hot: true,
+    },
 };
 

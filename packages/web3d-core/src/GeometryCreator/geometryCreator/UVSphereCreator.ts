@@ -1,6 +1,6 @@
 import { vec3 } from "gl-matrix";
 import { normalize } from "path";
-import { MeshData } from "../../interfaces";
+import { MeshData } from "../../Interfaces";
 import { Util } from "../../Util";
 
 export class UVSphereCreator {

@@ -1,4 +1,4 @@
-import { MeshData } from "./interfaces";
+import { MeshData } from "./Interfaces";
 export class Mesh {
     private vertices: Float32Array;
     private indices: Uint16Array;

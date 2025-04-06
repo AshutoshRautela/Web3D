@@ -6,6 +6,7 @@ import CottageMesh from './Mesh/Cottage_v2.obj';
 
 try {
     if (Web3D.init()) {
+        console.log("Web3D initialized");
         const scene: Scene = SceneManager.createScene("TestScene1", { width: window.innerWidth, height: window.innerHeight });
         document.body.appendChild(scene.CanvasElement);
 

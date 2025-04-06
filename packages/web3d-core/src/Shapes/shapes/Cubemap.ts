@@ -1,4 +1,4 @@
-import { MeshData } from "../../interfaces";
+import { MeshData } from "../../Interfaces";
 import { CubemapMaterial } from "../../Materials/materials/CubemapMaterial";
 import { Mesh } from "../../Mesh";
 import { MeshRenderer } from "../../MeshRenderer";

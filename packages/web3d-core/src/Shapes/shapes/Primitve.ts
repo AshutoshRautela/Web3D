@@ -1,6 +1,6 @@
 import { Mesh } from "../../Mesh";
 import { Scene } from "../../SceneManagement";
-import { MeshData } from "../../interfaces";
+import { MeshData } from "../../Interfaces";
 // Loading Obj Models
 import MonkeyMesh from "../../MeshFiles/Obj/Monkey.obj";
 import { MeshRenderer } from "../../MeshRenderer";
